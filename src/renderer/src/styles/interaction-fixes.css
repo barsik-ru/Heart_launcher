@@ -1,0 +1,278 @@
+/* 0.3.7 interaction fixes: stable server card, independent account actions, and a real save flow. */
+
+/* The server block uses a stacked address row so the full host and copy control never collide. */
+.sidebar > .server-mini {
+  padding: 15px 12px 12px;
+  border: 1px solid #344536;
+  border-radius: 4px 11px 4px 11px;
+  background: linear-gradient(145deg, #1a271c 0%, #141d16 78%);
+  overflow: hidden;
+}
+.server-mini-top {
+  min-width: 0;
+  gap: 8px;
+  font-size: 13px !important;
+}
+.server-mini-top > span:nth-child(2) {
+  min-width: 0;
+  color: #c4d1c0;
+  font-family: var(--font-sans) !important;
+  font-weight: 600;
+  letter-spacing: .01em;
+}
+.server-population {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  min-width: 0;
+  margin: 13px 0 11px;
+}
+.server-mini-number {
+  flex: 0 0 auto;
+  margin: 0 !important;
+  color: #edf2e9;
+  font-size: 29px !important;
+  line-height: 1;
+  font-weight: 650;
+  letter-spacing: -.045em;
+  font-variant-numeric: tabular-nums;
+}
+.server-population-detail {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  color: #a5b4a2;
+}
+.server-population-detail b {
+  font-size: 14px;
+  font-weight: 550;
+  font-variant-numeric: tabular-nums;
+}
+.server-population-detail small {
+  color: #819080;
+  font-size: 11px;
+}
+.server-population-label {
+  min-width: 0;
+  margin-left: auto;
+  color: #899888;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.server-meter {
+  height: 4px;
+  border-radius: 5px;
+  background: #344136;
+}
+.server-meter span {
+  border-radius: inherit;
+  background: linear-gradient(90deg, #789c69, #b2cf91);
+  transition: width .35s ease;
+}
+.server-address-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  margin-top: 13px;
+  padding-top: 11px;
+  border-top: 1px solid #2b3a2d;
+}
+.server-address-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.server-address-copy > span {
+  color: #93a28f;
+  font-size: 11px;
+  line-height: 1.3;
+}
+.server-address-copy code {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  color: #d0dbc9;
+  font-family: var(--mono) !important;
+  font-size: 11px !important;
+  line-height: 1.4;
+  letter-spacing: -.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.server-address-row > button {
+  display: grid;
+  place-items: center;
+  width: 36px !important;
+  height: 36px !important;
+  padding: 0;
+  border: 1px solid #52664d !important;
+  border-radius: 4px 9px 4px 9px !important;
+  background: #253427 !important;
+  color: #c1d8ad !important;
+  cursor: pointer;
+  transition: background .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
+}
+.server-address-row > button:hover {
+  border-color: #8ca978 !important;
+  background: #314532 !important;
+  color: #edf5e7 !important;
+  transform: translateY(-1px);
+}
+.server-address-row > button.copied {
+  border-color: #78966b !important;
+  background: #2a3d2b !important;
+  color: #c9e5b5 !important;
+}
+.server-copy-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Account name and sign-out are two separate hit targets; hovering one never lights the other. */
+.user-mini,
+.user-mini:hover {
+  padding: 12px 2px 2px !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  transform: none !important;
+  transition: none !important;
+}
+.user-mini-row { align-items: center; }
+.user-mini-profile {
+  padding: 3px 2px;
+  border-radius: 3px;
+  transition: color .15s ease;
+}
+.user-mini-profile:hover { background: transparent !important; }
+.user-mini-profile:hover .user-mini-info b { color: #d7e6ca !important; }
+.user-mini-logout {
+  flex: 0 0 auto;
+  min-height: 32px;
+  padding: 6px 8px !important;
+  border: 1px solid #39483a !important;
+  border-radius: 4px 8px 4px 8px !important;
+  background: #18221a !important;
+  color: #a8b5a4 !important;
+}
+.user-mini-logout:hover:not(:disabled) {
+  border-color: #765044 !important;
+  background: #2b2420 !important;
+  color: #e1b5a9 !important;
+}
+
+/* Settings section navigation uses buttons, not hash links that collide with HashRouter. */
+.settings-nav button {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: #9aa79b;
+  font: 13px var(--font-sans);
+  text-align: left;
+  cursor: pointer;
+  transition: background .16s ease, color .16s ease, border-color .16s ease;
+}
+.settings-nav button:hover,
+.settings-nav button.selected {
+  border-color: #344635;
+  background: #202b22;
+  color: #c5d8bb;
+}
+.settings-nav button:focus-visible {
+  outline: 2px solid #a9ca8c;
+  outline-offset: 2px;
+}
+.settings-section { scroll-margin-top: 18px; }
+.save-button:disabled { opacity: .55; cursor: default; transform: none; }
+
+/* The draft bar appears only while there are real unsaved changes. */
+.settings-save-dock {
+  position: fixed;
+  z-index: 30;
+  right: 30px;
+  bottom: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  width: min(620px, calc(100vw - 300px));
+  padding: 12px 14px;
+  border: 1px solid #617a56;
+  border-radius: 5px 13px 5px 13px;
+  background: #1c2a1f;
+  box-shadow: 0 12px 34px #0008, inset 0 1px #ffffff0a;
+  animation: settings-dock-in .2s ease-out both;
+}
+.settings-save-copy {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.settings-save-dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  border-radius: 50%;
+  background: #d0b06d;
+  box-shadow: 0 0 0 4px #d0b06d17;
+}
+.settings-save-copy > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.settings-save-copy strong { color: #e4ebdf; font-size: 13px; font-weight: 650; }
+.settings-save-copy small { color: #a2b09e; font-size: 12px; }
+.settings-save-actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+.settings-save-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid #53654e;
+  border-radius: 4px;
+  background: #253529;
+  color: #c8d9be;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, transform .15s ease;
+}
+.settings-save-actions button:hover { border-color: #8eaa7d; background: #304332; transform: translateY(-1px); }
+.settings-save-actions .settings-save-button { border-color: #9ab583; background: #91ad7b; color: #152017; font-weight: 650; }
+.settings-save-actions .settings-save-button:hover { border-color: #b3cf9d; background: #a4c28e; }
+.settings-feedback { position: relative; z-index: 2; }
+
+@keyframes settings-dock-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 900px) {
+  .settings-save-dock { right: 16px; bottom: 16px; width: min(620px, calc(100vw - 100px)); }
+}
+@media (max-width: 620px) {
+  .settings-save-dock { left: 84px; right: 10px; width: auto; flex-direction: column; align-items: stretch; gap: 10px; }
+  .settings-save-actions { justify-content: flex-end; }
+  .server-mini { padding: 12px 9px 10px !important; }
+  .server-population-label { font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .settings-save-dock { animation: none; }
+  .server-meter span,
+  .server-address-row > button,
+  .settings-save-actions button { transition: none; }
+}

@@ -1,0 +1,263 @@
+@font-face {
+  font-family: 'Minecraft Rus';
+  src: url('../assets/fonts/MinecraftRus.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-sans: 'Minecraft Rus', monospace, sans-serif !important;
+  --font-minecraft: 'Minecraft Rus', monospace, sans-serif !important;
+  --mono: 'Minecraft Rus', monospace !important;
+  --radius: 0px !important;
+  --radius-lg: 0px !important;
+}
+
+/* Принудительное применение Minecraft Rus ко всем элементам */
+*, *::before, *::after,
+html, body, #root,
+body, button, input, select, textarea,
+h1, h2, h3, h4, h5, h6, p, label, a, span, strong, b, small, time, code, i, em {
+  font-family: 'Minecraft Rus', monospace, sans-serif !important;
+  letter-spacing: 0.02em;
+}
+
+/* Все кнопки и элементы ввода делаем строго квадратными */
+button,
+input,
+select,
+textarea,
+.primary-button,
+.outline-button,
+.home-primary-action,
+.save-button,
+.user-mini-logout,
+.server-address-row > button,
+.settings-nav button,
+.settings-save-actions button,
+.auth-submit,
+.appearance-setup-submit,
+.cancel-operation,
+.news-card-equal,
+.server-mini,
+.hero-card,
+.panel,
+.profile-panel,
+.modpack-main-card,
+.modpack-status-card,
+.changelog-panel,
+.settings-content,
+.install-summary,
+.logs-panel {
+  border-radius: 0px !important;
+}
+
+html, body, #root { min-width: 0; }
+body { font-size: 14px; line-height: 1.55; color: var(--text); }
+p { text-wrap: pretty; }
+
+/* Navigation and window */
+.titlebar { height: 39px; flex-basis: 39px; background: var(--surface); border-bottom: 1px solid var(--border); }
+.titlebar-brand { letter-spacing: .08em; }
+.sidebar { width: 232px; flex-basis: 232px; padding: 25px 14px 14px; background: var(--surface); border-right: 1px solid var(--border); }
+.brand-lockup { padding: 0 10px 30px; }
+.brand-name { font-size: 18px !important; letter-spacing: .08em !important; color: var(--text); }
+.nav-link { height: 44px; min-height: 44px; border-radius: 0 !important; font-size: 13px; gap: 12px; color: var(--muted); }
+.nav-link.active { background: color-mix(in srgb, var(--accent) 15%, var(--surface-raised)); border-color: var(--border); color: var(--text); }
+.nav-link.active:before { border-radius: 0 !important; background: var(--accent); }
+.server-mini { padding: 13px 12px; border-radius: 0 !important; background: var(--surface-raised); border: 1px solid var(--border); }
+.server-mini::before { display: none !important; content: none !important; }
+.server-mini-top { font-size: 12px !important; letter-spacing: 0; color: var(--muted); }
+.server-live { font-size: 12px !important; color: var(--accent); }
+
+/* Версия лаунчера: нейтральный серый цвет */
+.sidebar-version,
+.sidebar-version span,
+.sidebar-version code {
+  font-size: 11px !important;
+  letter-spacing: .01em;
+  color: var(--muted) !important;
+}
+
+.user-mini { padding-top: 12px; border-top: 1px solid var(--border); }
+.user-mini-info b { font-size: 13px; color: var(--text); }
+.user-mini-info span { font-size: 11px; color: var(--muted); }
+
+/* Main content */
+.main-content {
+  padding: 0 36px 34px;
+  background: var(--bg);
+  scrollbar-color: var(--border) var(--surface);
+}
+.topline { display: none !important; }
+.page-content { max-width: 1440px; }
+.section-heading { margin: 2px 0 23px; }
+.section-heading h1 { margin: 8px 0 5px; font-size: 26px !important; line-height: 1.2; font-weight: 700; color: var(--text); }
+.section-heading p { font-size: 13px !important; line-height: 1.55; color: var(--muted); }
+.section-row { margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+.section-row h2, .panel-heading h2 { font-size: 18px !important; line-height: 1.3; font-weight: 650; color: var(--text); }
+.inline-link { font-size: 12px; color: var(--accent); }
+
+/* Hero banner */
+.hero-card {
+  height: 344px;
+  border: 1px solid var(--border);
+  box-shadow: none;
+  background: var(--surface);
+  position: relative;
+  overflow: hidden !important;
+  transform: translateZ(0);
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  isolation: isolate;
+}
+.hero-image {
+  position: absolute;
+  inset: 0;
+  filter: saturate(1.02) brightness(.93);
+  background-size: cover;
+  background-position: center 52%;
+  z-index: 0;
+}
+.hero-shade {
+  position: absolute;
+  inset: -5px;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, var(--bg) 0%, var(--bg) 24px, color-mix(in srgb, var(--bg) 88%, transparent) 38%, transparent 100%),
+    linear-gradient(0deg, var(--bg) 0%, transparent 43%);
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 620px;
+  padding: 39px 42px 30px;
+}
+
+/* Заголовок с увеличенным расстоянием между строками */
+.hero-content h1,
+.hero-title {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  font-size: clamp(34px, 3vw, 42px) !important;
+  line-height: 1.15 !important;
+  font-weight: 700 !important;
+  margin: 0 0 13px !important;
+  color: var(--text) !important;
+}
+
+.home-primary-action { min-width: 174px; height: 46px; font-size: 14px; letter-spacing: 0; }
+.hero-secondary { font-size: 13px !important; letter-spacing: 0; color: var(--text); }
+.hero-build { margin-top: 23px; font-size: 12px; color: var(--muted); }
+
+/* Client summary */
+.client-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 16px 0 28px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-raised);
+}
+.client-summary-version { display: flex; align-items: center; gap: 12px; }
+.client-summary-symbol { color: var(--accent); }
+.client-summary-label { display: block; font-size: 11px; color: var(--muted); }
+.client-summary-version strong { font-size: 14px; color: var(--text); }
+.client-summary-game { font-size: 13px; color: var(--muted); }
+.client-summary-game strong { color: var(--text); margin-left: 6px; }
+.client-summary-state { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--accent); }
+
+/* Settings layout */
+.settings-layout { display: grid; grid-template-columns: 215px minmax(0, 1fr); gap: 20px; }
+.settings-nav button { height: 40px; font-size: 11px !important; border-radius: 0 !important; display: flex; align-items: center; gap: 8px; width: 100%; border: 0; background: transparent; color: var(--muted); cursor: pointer; padding: 0 10px; text-align: left; }
+.settings-nav button svg { flex-shrink: 0 !important; width: 16px !important; height: 16px !important; color: var(--accent); }
+.settings-nav button.selected, .settings-nav button:hover { background: var(--surface-raised); color: var(--text); }
+.settings-section { padding: 20px 22px; border-bottom: 1px solid var(--border); }
+.settings-section:last-child { border: 0; }
+.settings-title { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 16px; }
+.settings-title svg { color: var(--accent); flex-shrink: 0; }
+.settings-title h3 { font-size: 15px; margin: 0 0 4px; color: var(--text); }
+.settings-title p, .setting-help { font-size: 12px !important; line-height: 1.5; color: var(--muted); margin: 0; }
+
+/* ==============================================================
+   ИСПРАВЛЕННЫЙ КВАДРАТНЫЙ СЛАЙДЕР RAM И РАЗНЕСЕННЫЕ МЕТКИ
+   ============================================================== */
+.setting-label {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100% !important;
+  margin-bottom: 8px !important;
+}
+.setting-label label {
+  font-size: 13px !important;
+  color: var(--text) !important;
+}
+.setting-label strong {
+  font-size: 14px !important;
+  color: var(--accent) !important;
+}
+
+/* Квадратный трек слайдера */
+.range-input {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 100% !important;
+  height: 10px !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 0px !important;
+  outline: none !important;
+  margin: 10px 0 6px !important;
+  cursor: pointer;
+}
+
+/* Квадратный бегунок слайдера (как ручка в Minecraft) */
+.range-input::-webkit-slider-thumb {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 14px !important;
+  height: 22px !important;
+  border-radius: 0px !important;
+  background: var(--accent) !important;
+  border: 1px solid var(--border) !important;
+  cursor: pointer;
+}
+.range-input::-moz-range-thumb {
+  width: 14px !important;
+  height: 22px !important;
+  border-radius: 0px !important;
+  background: var(--accent) !important;
+  border: 1px solid var(--border) !important;
+  cursor: pointer;
+}
+
+/* Метки 2 GB и 16 GB строго по противоположным краям */
+.range-labels {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100% !important;
+  color: var(--muted) !important;
+  font-size: 11px !important;
+  margin-top: 6px !important;
+}
+.range-labels span {
+  display: inline-block !important;
+}
+
+.path-input input, .resolution-fields input, .setting-control select { font-size: 13px !important; border-radius: 0 !important; height: 36px; padding: 0 10px; background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+.toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-top: 1px solid var(--border); }
+.toggle-row b { font-size: 13px !important; color: var(--text); }
+.toggle-row p { font-size: 12px !important; color: var(--muted); margin: 3px 0 0; }
+
+/* Buttons */
+.primary-button, .outline-button {
+  border-radius: 0px !important;
+  font-size: 13px !important;
+  letter-spacing: 0.02em;
+}

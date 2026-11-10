@@ -1,0 +1,128 @@
+/* Heart — restrained interface motion without subpixel scaling artifacts */
+
+.app-root.motion-on .hero-card {
+  animation: heart-hero-arrive 400ms cubic-bezier(.2,.8,.2,1) both;
+}
+.app-root.motion-on .hero-content h1 {
+  animation: heart-heading-arrive 420ms 50ms cubic-bezier(.2,.8,.2,1) both;
+}
+.app-root.motion-on .hero-actions > :first-child {
+  animation: heart-action-arrive 380ms 120ms cubic-bezier(.2,.8,.2,1) both;
+}
+.app-root.motion-on .hero-actions > :last-child {
+  animation: heart-action-arrive 380ms 180ms cubic-bezier(.2,.8,.2,1) both;
+}
+
+.app-root.motion-on .home-metrics .metric-card {
+  animation: heart-metric-arrive 380ms cubic-bezier(.2,.8,.2,1) both;
+}
+.app-root.motion-on .home-metrics .metric-card:nth-child(1) { animation-delay: 40ms; }
+.app-root.motion-on .home-metrics .metric-card:nth-child(2) { animation-delay: 80ms; }
+.app-root.motion-on .home-metrics .metric-card:nth-child(3) { animation-delay: 120ms; }
+.app-root.motion-on .home-metrics .metric-card:nth-child(4) { animation-delay: 160ms; }
+
+.app-root.motion-on .home-news-section > .section-row {
+  animation: heart-heading-arrive 350ms 80ms ease-out both;
+}
+.app-root.motion-on .news-grid-equal .news-card-equal {
+  animation: heart-card-arrive 400ms cubic-bezier(.2,.8,.2,1) both !important;
+}
+.app-root.motion-on .news-grid-equal .news-card-equal:nth-child(1) { animation-delay: 80ms !important; }
+.app-root.motion-on .news-grid-equal .news-card-equal:nth-child(2) { animation-delay: 140ms !important; }
+
+.app-root.motion-on .profile-hero {
+  animation: heart-card-arrive 420ms cubic-bezier(.2,.8,.2,1) both;
+}
+.app-root.motion-on .profile-grid .profile-panel {
+  animation: heart-panel-arrive 420ms cubic-bezier(.2,.8,.2,1) both;
+}
+.app-root.motion-on .profile-grid .profile-panel:nth-child(2) { animation-delay: 80ms; }
+
+.app-root.motion-on .settings-section {
+  animation: heart-panel-arrive 380ms cubic-bezier(.2,.8,.2,1) both;
+}
+.app-root.motion-on .settings-section:nth-child(2) { animation-delay: 50ms; }
+.app-root.motion-on .settings-section:nth-child(3) { animation-delay: 100ms; }
+.app-root.motion-on .settings-section:nth-child(4) { animation-delay: 150ms; }
+.app-root.motion-on .settings-nav button {
+  transition: transform 150ms cubic-bezier(.2,.8,.2,1), color 150ms ease, background 150ms ease;
+}
+.app-root.motion-on .settings-nav button:hover { transform: translateX(3px); }
+
+.app-root.motion-on .modpack-main-card,
+.app-root.motion-on .modpack-status-card,
+.app-root.motion-on .changelog-panel {
+  animation: heart-panel-arrive 420ms cubic-bezier(.2,.8,.2,1) both;
+}
+.app-root.motion-on .modpack-status-card { animation-delay: 60ms; }
+.app-root.motion-on .changelog-panel { animation-delay: 120ms; }
+
+.app-root.motion-on .news-list-card {
+  animation: heart-card-arrive 380ms cubic-bezier(.2,.8,.2,1) both;
+}
+.app-root.motion-on .news-list-image {
+  transition: transform 400ms cubic-bezier(.2,.8,.2,1), filter 300ms ease;
+}
+.app-root.motion-on .news-list-card:hover .news-list-image {
+  transform: scale(1.025);
+  filter: saturate(.95) brightness(1.04);
+}
+.app-root.motion-on .article-cover {
+  animation: heart-cover-arrive 450ms cubic-bezier(.2,.8,.2,1) both;
+}
+
+.app-root.motion-on .brand-mark {
+  transition: transform 250ms cubic-bezier(.2,.8,.2,1);
+}
+.app-root.motion-on .brand-lockup:hover .brand-mark {
+  transform: translateY(-2px) scale(1.03);
+}
+.app-root.motion-on .nav-link svg,
+.app-root.motion-on .primary-button svg,
+.app-root.motion-on .outline-button svg,
+.app-root.motion-on .text-button svg {
+  transition: transform 180ms cubic-bezier(.2,.8,.2,1);
+}
+.app-root.motion-on .nav-link:hover svg { transform: translateY(-1px) scale(1.05); }
+.app-root.motion-on .primary-button:hover:not(:disabled) svg { transform: translateY(-1px) scale(1.06); }
+.app-root.motion-on .outline-button:hover:not(:disabled) svg { transform: translateX(2px); }
+.app-root.motion-on button:active:not(:disabled) { transition-duration: 60ms; }
+
+/* Анимации без дробного зума scale(0.993), чтобы края не вылезали за маску */
+@keyframes heart-hero-arrive {
+  from { opacity: .75; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes heart-heading-arrive {
+  from { opacity: .7; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes heart-action-arrive {
+  from { opacity: .65; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes heart-metric-arrive {
+  from { opacity: .65; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes heart-card-arrive {
+  from { opacity: .7; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes heart-panel-arrive {
+  from { opacity: .7; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes heart-cover-arrive {
+  from { opacity: .7; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-root.motion-on *,
+  .app-root.motion-on *::before,
+  .app-root.motion-on *::after {
+    animation: none !important;
+    transition-duration: .01ms !important;
+  }
+}

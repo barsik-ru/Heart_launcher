@@ -1,0 +1,53 @@
+@font-face {
+  font-family: 'Minecraft Rus';
+  src: url('../assets/fonts/MinecraftRus.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: dark;
+  font-family: 'Minecraft Rus', 'Segoe UI Variable', system-ui, Arial, sans-serif;
+  color: var(--brand-text, #dce5dd);
+  background: var(--brand-background, #101512);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  --bg: var(--brand-background, #101512);
+  --surface: #151c17;
+  --surface-raised: #19221c;
+  --panel: var(--brand-panel, #202923);
+  --panel-2: #263129;
+  --border: var(--brand-border, #2d3a30);
+  --border-soft: #253128;
+  --text: var(--brand-text, #dce5dd);
+  --muted: #94a095;
+  --subtle: #68756c;
+  --accent: var(--brand-accent, #91b87b);
+  --accent-strong: #a6cb91;
+  --accent-dim: #557b4b;
+  --danger: #d18a7d;
+  --warning: #c9aa70;
+  --radius: 5px;
+  --radius-lg: 11px;
+  --space-1: 4px;
+  --space-2: 11px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --mono: 'Cascadia Code', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --font-sans: 'Minecraft Rus', sans-serif;
+  --font-minecraft: 'Minecraft Rus', sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+body { background: var(--bg); font-size: 14px; font-family: var(--font-sans); }
+button, input, select, textarea { font: inherit; }
+button { color: inherit; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+::selection { background: #557b4b80; color: #fff; }

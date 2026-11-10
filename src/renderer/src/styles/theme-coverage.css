@@ -1,0 +1,544 @@
+/* Theme coverage v0.3.9
+   Replace legacy Heart-green literals in the remaining screens with semantic theme tokens. */
+
+.app-root[data-theme='verdant'] { --accent-ink: #11170f; }
+.app-root[data-theme='obsidian'] { --accent-ink: #17171b; }
+.app-root[data-theme='crimson'] { --accent-ink: #211216; }
+.app-root[data-theme='ocean'] { --accent-ink: #0e1b20; }
+.app-root[data-theme='amethyst'] { --accent-ink: #1c1427; }
+
+.app-root[data-theme] {
+  --accent-soft: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  --accent-soft-strong: color-mix(in srgb, var(--accent) 19%, var(--surface));
+  --accent-border: color-mix(in srgb, var(--accent) 42%, var(--border));
+  --accent-hover: color-mix(in srgb, var(--accent) 86%, white);
+  --surface-hover: color-mix(in srgb, var(--accent) 8%, var(--surface-raised));
+  --danger-soft: color-mix(in srgb, var(--danger) 12%, var(--surface));
+  --danger-border: color-mix(in srgb, var(--danger) 38%, var(--border));
+  --warning-soft: color-mix(in srgb, var(--warning) 12%, var(--surface));
+  color-scheme: dark;
+  accent-color: var(--accent);
+}
+
+/* Window and base controls */
+.app-root[data-theme] .titlebar,
+.app-root[data-theme] .sidebar,
+.app-root[data-theme] .auth-window,
+.app-root[data-theme] .auth-screen,
+.app-root[data-theme] .auth-panel {
+  background-color: var(--surface);
+  border-color: var(--border);
+}
+.app-root[data-theme] .titlebar { border-bottom-color: var(--border); }
+.app-root[data-theme] .window-actions button:hover:not(.close) {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.app-root[data-theme] .window-actions .close:hover {
+  background: var(--danger);
+  color: #fff;
+}
+.app-root[data-theme] .brand-name,
+.app-root[data-theme] .titlebar-brand { color: var(--text); }
+.app-root[data-theme] .brand-mark,
+.app-root[data-theme] .brand-mark.large {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+}
+.app-root[data-theme] .nav-link { color: var(--muted); }
+.app-root[data-theme] .nav-link:hover {
+  color: var(--text);
+  background: var(--surface-hover);
+  border-color: var(--border);
+}
+.app-root[data-theme] .nav-link.active {
+  color: var(--text);
+  background: var(--accent-soft);
+  border-color: transparent;
+}
+.app-root[data-theme] .nav-link.active::before { background: var(--accent); }
+.app-root[data-theme] .nav-link:focus-visible { outline-color: var(--accent); }
+
+.app-root[data-theme] .primary-button,
+.app-root[data-theme] .auth-submit,
+.app-root[data-theme] .appearance-setup-submit {
+  color: var(--accent-ink) !important;
+  background: var(--accent) !important;
+  border-color: var(--accent-strong) !important;
+  box-shadow: 0 5px 16px #00000035, inset 0 1px #ffffff30;
+}
+.app-root[data-theme] .primary-button:hover:not(:disabled),
+.app-root[data-theme] .auth-submit:hover:not(:disabled),
+.app-root[data-theme] .appearance-setup-submit:hover:not(:disabled) {
+  color: var(--accent-ink) !important;
+  background: var(--accent-hover) !important;
+  border-color: var(--accent-hover) !important;
+  box-shadow: 0 7px 19px color-mix(in srgb, var(--accent) 18%, transparent), inset 0 1px #ffffff38;
+}
+.app-root[data-theme] .outline-button {
+  color: var(--text);
+  background: var(--surface-raised);
+  border-color: var(--border);
+}
+.app-root[data-theme] .outline-button:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--surface-hover);
+  border-color: var(--accent-border);
+}
+.app-root[data-theme] .text-button,
+.app-root[data-theme] .inline-link,
+.app-root[data-theme] .hero-secondary,
+.app-root[data-theme] .auth-switch a,
+.app-root[data-theme] .auth-options .text-button {
+  color: var(--accent);
+}
+.app-root[data-theme] .text-button:hover,
+.app-root[data-theme] .inline-link:hover,
+.app-root[data-theme] .hero-secondary:hover,
+.app-root[data-theme] .auth-switch a:hover {
+  color: var(--accent-hover);
+}
+.app-root[data-theme] button:focus-visible,
+.app-root[data-theme] a:focus-visible,
+.app-root[data-theme] input:focus-visible,
+.app-root[data-theme] select:focus-visible { outline-color: var(--accent); }
+
+/* Login and registration */
+.app-root[data-theme] .auth-art { background: var(--surface-raised); }
+.app-root[data-theme] .auth-art-image { background-color: var(--surface-raised); }
+.app-root[data-theme] .auth-art-overlay {
+  background:
+    linear-gradient(90deg,
+      color-mix(in srgb, var(--bg) 92%, transparent) 0%,
+      color-mix(in srgb, var(--bg) 72%, transparent) 38%,
+      color-mix(in srgb, var(--bg) 18%, transparent) 100%),
+    linear-gradient(0deg, color-mix(in srgb, var(--bg) 88%, transparent), transparent 62%);
+}
+.app-root[data-theme] .auth-brand,
+.app-root[data-theme] .auth-form-wrap h2 { color: var(--text); }
+.app-root[data-theme] .auth-art-copy h1 em,
+.app-root[data-theme] .auth-art-copy .eyebrow,
+.app-root[data-theme] .auth-world-meta i { color: var(--accent); }
+.app-root[data-theme] .auth-world-meta i { background: var(--accent); }
+.app-root[data-theme] .auth-panel { border-left-color: var(--border); }
+.app-root[data-theme] .auth-panel-top > span,
+.app-root[data-theme] .auth-subtitle,
+.app-root[data-theme] .auth-form > label:not(.check-line),
+.app-root[data-theme] .auth-switch,
+.app-root[data-theme] .auth-legal,
+.app-root[data-theme] .auth-art-footer { color: var(--muted); }
+.app-root[data-theme] .auth-input-wrap {
+  color: var(--muted);
+  background: var(--surface-raised);
+  border-color: var(--border);
+}
+.app-root[data-theme] .auth-input-wrap:focus-within {
+  background: var(--surface-hover);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.app-root[data-theme] .auth-input-wrap > svg,
+.app-root[data-theme] .password-visibility { color: var(--muted); }
+.app-root[data-theme] .password-visibility:hover {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.app-root[data-theme] .auth-input-wrap input { color: var(--text); }
+.app-root[data-theme] .auth-input-wrap input::placeholder { color: var(--subtle); }
+.app-root[data-theme] .check-line { color: var(--muted); }
+.app-root[data-theme] .check-line input { accent-color: var(--accent); }
+.app-root[data-theme] .demo-hint {
+  color: var(--warning);
+  background: var(--warning-soft);
+  border-color: color-mix(in srgb, var(--warning) 34%, var(--border));
+}
+.app-root[data-theme] .demo-hint strong { color: var(--warning); }
+.app-root[data-theme] .offline-hint {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: var(--danger-border);
+}
+.app-root[data-theme] .form-error {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-color: var(--danger-border);
+}
+
+/* Server card and copy-address action */
+.app-root[data-theme] .sidebar > .server-mini {
+  color: var(--text);
+  background: linear-gradient(145deg, var(--surface-raised), var(--surface));
+  border-color: var(--border);
+}
+.app-root[data-theme] .server-mini-top,
+.app-root[data-theme] .server-population-detail,
+.app-root[data-theme] .server-population-label,
+.app-root[data-theme] .server-address-copy > span { color: var(--muted); }
+.app-root[data-theme] .server-mini-top > span:nth-child(2),
+.app-root[data-theme] .server-mini-number,
+.app-root[data-theme] .server-address-copy code { color: var(--text); }
+.app-root[data-theme] .server-live { color: var(--accent); }
+.app-root[data-theme] .server-live.is-offline { color: var(--danger); }
+.app-root[data-theme] .server-mini .status-dot:not(.is-offline) { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.app-root[data-theme] .server-meter { background: var(--panel-2); }
+.app-root[data-theme] .server-meter > span {
+  background: linear-gradient(90deg, var(--accent-dim), var(--accent-hover));
+}
+.app-root[data-theme] .server-address-row { border-top-color: var(--border); }
+.app-root[data-theme] .server-address-row > button {
+  color: var(--accent) !important;
+  background: var(--accent-soft) !important;
+  border-color: var(--accent-border) !important;
+}
+.app-root[data-theme] .server-address-row > button:hover:not(:disabled) {
+  color: var(--accent-hover) !important;
+  background: var(--accent-soft-strong) !important;
+  border-color: var(--accent) !important;
+}
+.app-root[data-theme] .server-address-row > button.copied {
+  color: var(--accent-ink) !important;
+  background: var(--accent) !important;
+}
+.app-root[data-theme] .server-copy-status { color: var(--accent); }
+
+/* The one-line installed client summary on Home */
+.app-root[data-theme] .client-summary {
+  color: var(--text);
+  border-top: 1px solid var(--border) !important;
+  border-bottom: 1px solid var(--border) !important;
+  background: linear-gradient(100deg,
+    color-mix(in srgb, var(--accent) 8%, var(--surface)) 0%,
+    var(--surface) 72%) !important;
+}
+.app-root[data-theme] .client-summary-symbol {
+  color: var(--accent) !important;
+  background: var(--accent-soft) !important;
+  border-left: 2px solid var(--accent) !important;
+}
+.app-root[data-theme] .client-summary-label,
+.app-root[data-theme] .client-summary-game { color: var(--muted) !important; }
+.app-root[data-theme] .client-summary-game { border-left: 1px solid var(--border) !important; }
+.app-root[data-theme] .client-summary-game strong,
+.app-root[data-theme] .client-summary-version strong { color: var(--text) !important; }
+.app-root[data-theme] .client-state-indicator {
+  color: var(--accent) !important;
+  background: var(--accent-soft) !important;
+}
+.app-root[data-theme] .client-summary-state { color: var(--muted) !important; }
+.app-root[data-theme] .client-summary-state.is-installed { color: var(--accent) !important; }
+.app-root[data-theme] .client-summary-state.is-installed .client-state-indicator {
+  color: var(--accent) !important;
+  background: var(--accent-soft) !important;
+}
+.app-root[data-theme] .client-summary-state.has-update { color: var(--warning) !important; }
+.app-root[data-theme] .client-summary-state.has-update .client-state-indicator {
+  color: var(--warning) !important;
+  background: var(--warning-soft) !important;
+}
+
+/* ==============================================================
+   Полоса загрузки на главной (.home-operation) под тему
+   ============================================================== */
+.app-root[data-theme] .home-operation {
+  background: var(--surface-raised) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+  color: var(--text) !important;
+}
+.app-root[data-theme] .home-operation strong {
+  color: var(--text) !important;
+}
+.app-root[data-theme] .home-operation small {
+  color: var(--muted) !important;
+}
+.app-root[data-theme] .home-operation .operation-kicker {
+  color: var(--accent) !important;
+}
+.app-root[data-theme] .operation-meter,
+.app-root[data-theme] .progress-track,
+.app-root[data-theme] .install-progress-track {
+  background: var(--panel-2) !important;
+  border-radius: 4px !important;
+}
+.app-root[data-theme] .operation-meter > i,
+.app-root[data-theme] .progress-track > i,
+.app-root[data-theme] .install-progress-track > i {
+  background: var(--accent) !important;
+  box-shadow: 0 0 10px var(--accent-soft) !important;
+}
+
+/* ==============================================================
+   Скелетоны новостей (убираем зелёный цвет ожидания)
+   ============================================================== */
+.app-root[data-theme] .home-news-skeleton-card,
+.app-root[data-theme] .home-news-skeleton-card-compact {
+  background: var(--surface-raised) !important;
+  border: 1px solid var(--border) !important;
+}
+.app-root[data-theme] .home-news-skeleton-card::before,
+.app-root[data-theme] .home-news-skeleton-card-compact::before {
+  background: linear-gradient(100deg, var(--surface), var(--panel-2) 45%, var(--surface)) !important;
+}
+.app-root[data-theme] .home-news-skeleton-card i,
+.app-root[data-theme] .home-news-skeleton-card span,
+.app-root[data-theme] .home-news-skeleton-card b,
+.app-root[data-theme] .home-news-skeleton-card small,
+.app-root[data-theme] .news-loading-copy i,
+.app-root[data-theme] .news-loading-copy b,
+.app-root[data-theme] .news-loading-copy em,
+.app-root[data-theme] .news-loading-copy small {
+  background: linear-gradient(90deg, var(--panel-2) 0%, var(--surface-hover) 45%, var(--panel-2) 90%) !important;
+  background-size: 220% 100% !important;
+}
+.app-root[data-theme] .news-loading-row {
+  background: var(--surface-raised) !important;
+  border: 1px solid var(--border) !important;
+}
+.app-root[data-theme] .news-loading-image {
+  background: linear-gradient(100deg, var(--surface), var(--panel-2) 45%, var(--surface)) !important;
+}
+.app-root[data-theme] .modpack-loading-feature,
+.app-root[data-theme] .modpack-loading-status,
+.app-root[data-theme] .modpack-loading-log {
+  border-color: var(--border) !important;
+  background: linear-gradient(105deg, var(--surface) 0%, var(--surface-hover) 48%, var(--surface) 88%) !important;
+}
+
+/* Profile */
+.app-root[data-theme] .profile-hero {
+  color: var(--text);
+  background: linear-gradient(105deg, var(--surface-raised), var(--surface));
+  border-color: var(--border);
+}
+.app-root[data-theme] .profile-avatar {
+  color: var(--accent);
+  background: var(--accent-soft-strong);
+  border-color: var(--accent-border);
+}
+.app-root[data-theme] .profile-avatar > span {
+  background: var(--accent);
+  border-color: var(--surface);
+}
+.app-root[data-theme] .profile-identity h2,
+.app-root[data-theme] .profile-data-row b,
+.app-root[data-theme] .minecraft-unlinked h3 { color: var(--text); }
+.app-root[data-theme] .profile-id,
+.app-root[data-theme] .profile-data-row > span,
+.app-root[data-theme] .muted-note { color: var(--muted); }
+.app-root[data-theme] .profile-status,
+.app-root[data-theme] .profile-data-row b.online-text { color: var(--accent) !important; }
+.app-root[data-theme] .profile-panel,
+.app-root[data-theme] .minecraft-panel {
+  color: var(--text);
+  background: var(--surface-raised);
+  border-color: var(--border);
+}
+.app-root[data-theme] .profile-data-row { border-bottom-color: var(--border); }
+.app-root[data-theme] .minecraft-panel .panel-heading > svg { color: var(--accent); }
+.app-root[data-theme] .mc-icon {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+}
+.app-root[data-theme] .profile-note {
+  color: var(--muted);
+  background: var(--surface-raised);
+  border-color: var(--border);
+}
+.app-root[data-theme] .profile-note > svg:first-child { color: var(--accent); }
+
+/* Modpack and installation */
+.app-root[data-theme] .modpack-main-card,
+.app-root[data-theme] .modpack-status-card,
+.app-root[data-theme] .changelog-panel,
+.app-root[data-theme] .install-summary,
+.app-root[data-theme] .logs-panel {
+  color: var(--text);
+  background-color: var(--surface-raised);
+  border-color: var(--border);
+}
+.app-root[data-theme] .modpack-main-card { background-color: var(--surface); }
+.app-root[data-theme] .modpack-card-art { background-color: var(--surface); }
+.app-root[data-theme] .modpack-main-copy > p,
+.app-root[data-theme] .version-details span,
+.app-root[data-theme] .file-status small,
+.app-root[data-theme] .last-check,
+.app-root[data-theme] .modpack-footer > div { color: var(--muted); }
+.app-root[data-theme] .version-big > span { color: var(--accent); }
+.app-root[data-theme] .version-details b { color: var(--text); }
+.app-root[data-theme] .release-chip {
+  color: var(--accent);
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+}
+.app-root[data-theme] .release-chip > span { background: var(--accent); }
+.app-root[data-theme] .status-card-head { color: var(--accent); border-bottom-color: var(--border); }
+.app-root[data-theme] .file-status { border-bottom-color: var(--border); }
+.app-root[data-theme] .file-status b { color: var(--text); }
+.app-root[data-theme] .status-check {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.app-root[data-theme] .status-check.warning {
+  color: var(--warning);
+  background: var(--warning-soft);
+}
+.app-root[data-theme] .update-size,
+.app-root[data-theme] .change-added,
+.app-root[data-theme] .change-plus { color: var(--accent); }
+.app-root[data-theme] .change-columns p { color: var(--muted); }
+.app-root[data-theme] .change-updated,
+.app-root[data-theme] .change-dot { color: var(--warning); }
+.app-root[data-theme] .change-removed,
+.app-root[data-theme] .change-minus { color: var(--danger); }
+.app-root[data-theme] .inline-progress {
+  color: var(--text);
+  background: var(--surface-raised) !important;
+  border: 1px solid var(--border) !important;
+}
+.app-root[data-theme] .inline-progress > div:first-child { color: var(--muted); }
+.app-root[data-theme] .inline-progress button { color: var(--danger); }
+
+/* News cards */
+.app-root[data-theme] .news-card,
+.app-root[data-theme] .news-list-card {
+  color: var(--text);
+  background: var(--surface-raised) !important;
+  border-color: var(--border) !important;
+}
+.app-root[data-theme] .news-card:hover,
+.app-root[data-theme] .news-list-card:hover {
+  background: var(--surface-hover) !important;
+  border-color: var(--accent-border) !important;
+}
+.app-root[data-theme] .news-meta > span,
+.app-root[data-theme] .news-read,
+.app-root[data-theme] .back-link { color: var(--accent) !important; }
+.app-root[data-theme] .news-list-copy h3,
+.app-root[data-theme] .news-card h3 { color: var(--text); }
+.app-root[data-theme] .news-list-copy p,
+.app-root[data-theme] .news-card p,
+.app-root[data-theme] .news-meta time { color: var(--muted); }
+
+/* Settings */
+.app-root[data-theme] .settings-content,
+.app-root[data-theme] .settings-section { background: var(--surface-raised); border-color: var(--border); }
+.app-root[data-theme] .settings-nav a,
+.app-root[data-theme] .settings-nav button { color: var(--muted) !important; }
+.app-root[data-theme] .settings-nav a:hover,
+.app-root[data-theme] .settings-nav a.selected,
+.app-root[data-theme] .settings-nav button:hover,
+.app-root[data-theme] .settings-nav button.selected {
+  color: var(--text) !important;
+  background: var(--accent-soft) !important;
+  border-color: var(--accent-border) !important;
+}
+.app-root[data-theme] .settings-title > svg { color: var(--accent); }
+.app-root[data-theme] .setting-control > label,
+.app-root[data-theme] .setting-label label,
+.app-root[data-theme] .toggle-row b { color: var(--text); }
+.app-root[data-theme] .setting-help,
+.app-root[data-theme] .toggle-row p,
+.app-root[data-theme] .range-labels { color: var(--muted) !important; }
+.app-root[data-theme] .range-input { accent-color: var(--accent); }
+.app-root[data-theme] .toggle { background: var(--panel-2); border-color: var(--border); }
+.app-root[data-theme] .toggle span { background: var(--muted); }
+.app-root[data-theme] .toggle.on { background: var(--accent); border-color: var(--accent); }
+.app-root[data-theme] .toggle.on span { background: var(--accent-ink); }
+.app-root[data-theme] .path-input button {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+}
+.app-root[data-theme] .path-input button:hover {
+  color: var(--accent-hover);
+  background: var(--accent-soft-strong);
+  border-color: var(--accent);
+}
+.app-root[data-theme] .settings-theme-choice { background: var(--surface); border-color: var(--border); }
+.app-root[data-theme] .settings-theme-choice:hover { background: var(--surface-hover); border-color: var(--accent); }
+.app-root[data-theme] .settings-theme-choice.selected { background: var(--accent-soft); border-color: var(--accent); }
+.app-root[data-theme] .settings-theme-choice > svg { color: var(--accent); }
+
+/* Settings dock */
+.app-root[data-theme] .settings-save-dock {
+  color: var(--text);
+  background: var(--surface-raised);
+  border-color: var(--accent-border);
+}
+.app-root[data-theme] .settings-save-copy strong { color: var(--text); }
+.app-root[data-theme] .settings-save-copy small { color: var(--muted); }
+.app-root[data-theme] .settings-save-actions button {
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--border);
+}
+.app-root[data-theme] .settings-save-actions button:hover {
+  color: var(--text);
+  background: var(--surface-hover);
+  border-color: var(--accent-border);
+}
+.app-root[data-theme] .settings-save-actions .settings-save-button {
+  color: var(--accent-ink);
+  background: var(--accent);
+  border-color: var(--accent-strong);
+}
+.app-root[data-theme] .settings-save-actions .settings-save-button:hover {
+  color: var(--accent-ink);
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+/* User logout */
+.app-root[data-theme] .user-mini { border-top-color: var(--border) !important; }
+.app-root[data-theme] .user-mini-logout {
+  color: var(--muted) !important;
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+}
+.app-root[data-theme] .user-mini-logout:hover:not(:disabled) {
+  color: var(--accent) !important;
+  background: var(--accent-soft) !important;
+  border-color: var(--accent-border) !important;
+}
+.app-root[data-theme] .user-mini-profile:hover .user-mini-info b { color: var(--text) !important; }
+.app-root[data-theme] .user-mini-error { color: var(--danger); }
+
+/* Status indicators */
+.app-root[data-theme] .status-dot:not(.is-offline),
+.app-root[data-theme] .live-dot,
+.app-root[data-theme] .tiny-dot { background: var(--accent); }
+.app-root[data-theme] .metric-icon,
+.app-root[data-theme] .metric-trend,
+.app-root[data-theme] .metric-caption,
+.app-root[data-theme] .hero-kicker > span,
+.app-root[data-theme] .hero-content h1 em { color: var(--accent); }
+.app-root[data-theme] .hero-kicker > span { background: var(--accent); }
+.app-root[data-theme] .home-error { border-color: var(--danger-border); }
+
+/* Modpack changelog tags */
+.app-root[data-theme] .config-changes { color: var(--muted); border-top-color: var(--border); }
+.app-root[data-theme] .config-changes > b {
+  color: var(--accent) !important;
+  background: var(--accent-soft) !important;
+  border-left-color: var(--accent-border) !important;
+}
+
+/* Page scrollbar */
+.app-root[data-theme] .main-content {
+  scrollbar-color: var(--accent) var(--surface);
+  scrollbar-width: thin;
+}
+.app-root[data-theme] .main-content::-webkit-scrollbar { width: 10px; }
+.app-root[data-theme] .main-content::-webkit-scrollbar-track { background: var(--surface); }
+.app-root[data-theme] .main-content::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border: 2px solid var(--surface);
+  border-radius: 999px;
+}
+.app-root[data-theme] .main-content::-webkit-scrollbar-thumb:hover { background: var(--accent-hover); }
+
+/* Selection */
+.app-root[data-theme] ::selection { color: var(--accent-ink); background: var(--accent); }
+.app-root[data-theme] ::-moz-selection { color: var(--accent-ink); background: var(--accent); }

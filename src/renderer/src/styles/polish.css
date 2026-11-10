@@ -1,0 +1,610 @@
+/* Heart design refinement: voxel scenery, restrained surfaces and a clearer type scale. */
+:root { --font-sans: 'Segoe UI Variable', 'Segoe UI', system-ui, Arial, sans-serif; }
+body, button, input, select { font-family: var(--font-sans); }
+h1, h2, h3, h4, p, label, a, span, strong, b { font-family: inherit; }
+.eyebrow, .nav-label, .breadcrumb, .mock-badge, .server-mini-top, .server-mini-number small,
+.sidebar-version, .hero-kicker, .hero-footnote, .hero-index, .metric-label, .metric-trend,
+.metric-caption, .metric-latency, .news-meta, .news-read, .back-link, .release-chip,
+.status-card-head, .last-check, .update-size, .change-columns h4, .profile-id,
+.profile-status, .subtle-tag, .auth-overline, .auth-world-meta, .auth-art-footer,
+.auth-language, .operation-kicker, .install-state-tag, .install-progress-details, .log-level {
+  font-family: var(--mono) !important;
+}
+
+/* Authentication */
+.auth-window { height: 100%; display: flex; flex-direction: column; background: var(--bg); }
+.auth-screen { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.16fr) minmax(430px, .84fr); background: #101712; overflow: hidden; }
+.auth-art { min-width: 0; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 44px 48px 27px; background: #17231a; }
+.auth-art-image { position: absolute; inset: 0; background: #1c2a20 center / cover no-repeat; filter: saturate(.98) brightness(.88); transform: none; }
+.auth-art-overlay { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(12,19,14,.94) 0%, rgba(13,20,15,.76) 36%, rgba(13,20,15,.2) 100%), linear-gradient(0deg, rgba(10,16,12,.88), transparent 55%); }
+.auth-brand, .auth-art-copy, .auth-art-footer { position: relative; z-index: 1; }
+.auth-brand { display: flex; align-items: center; gap: 13px; color: #edf3ea; }
+.auth-brand > span:last-child { display: flex; flex-direction: column; gap: 4px; }
+.auth-brand strong { font-size: 16px; letter-spacing: 2.11px; font-weight: 760; }
+.auth-brand small { color: #a1ad9f; font: 12px var(--mono); letter-spacing: 1.4px; }
+.auth-art-copy { max-width: 570px; margin: auto 0 58px; }
+.auth-art-copy .eyebrow { color: #b4c9aa; }
+.auth-art-copy h1 { font-size: clamp(38px, 4.5vw, 66px); line-height: 1.03; letter-spacing: -2.11px; font-weight: 740; margin: 20px 0 17px; color: #f0f4ed; }
+.auth-art-copy h1 em { color: #b0ce9f; font-style: normal; }
+.auth-art-copy p { max-width: 400px; margin: 0; color: #c1cbbf; font-size: 14px; line-height: 1.8; }
+.auth-world-meta { display: flex; gap: 23px; margin-top: 30px; color: #a9b6a8; font-size: 12px; letter-spacing: 1.1px; }
+.auth-world-meta span { display: flex; align-items: center; gap: 11px; }
+.auth-world-meta i { width: 6px; height: 6px; border-radius: 50%; background: #9fbe8e; }
+.auth-art-footer { display: flex; justify-content: space-between; color: #839183; font-size: 12px; letter-spacing: 1px; }
+.auth-panel { display: flex; flex-direction: column; justify-content: space-between; padding: 26px clamp(28px, 5vw, 70px) 23px; background: #121914; border-left: 1px solid #2b382d; min-width: 0; }
+.auth-panel-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.auth-language { color: #849285; font-size: 12px; letter-spacing: .11px; }
+.auth-language i { display: inline-block; height: 12px; width: 1px; margin: 0 7px; vertical-align: middle; background: #435044; }
+.auth-form-wrap { width: 100%; max-width: 430px; margin: auto; padding: 32px 0; }
+.auth-overline { color: #95a78e; font-size: 12px; letter-spacing: 1.5px; }
+.auth-form-wrap h2 { margin: 12px 0 11px; font-size: 29px; letter-spacing: -.11px; font-weight: 700; color: #e6ede5; }
+.auth-subtitle { color: #8f9c91; font-size: 13px; line-height: 1.65; margin: 0 0 29px; }
+.auth-form { display: flex; flex-direction: column; gap: 11px; }
+.auth-form > label:not(.check-line) { color: #9eaa9f; font-size: 12px; letter-spacing: 1px; font-family: var(--mono); margin-top: 11px; }
+.auth-input-wrap { min-height: 45px; display: flex; align-items: center; gap: 12px; padding: 0 13px; border: 1px solid #354238; border-radius: 4px; background: #19231c; color: #82927f; transition: border-color .16s ease, background .16s ease; }
+.auth-input-wrap:focus-within { border-color: #819a74; background: #1b271e; }
+.auth-input-wrap input { width: 100%; min-width: 0; height: 43px; color: #e0e8de; outline: 0; border: 0; background: transparent; font-size: 13px; }
+.auth-input-wrap input::placeholder { color: #67756b; }
+.auth-input-wrap input:focus-visible { outline: 0; }
+.password-visibility { flex: 0 0 auto; display: grid; place-items: center; padding: 4px; border: 0; background: transparent; color: #89988a; cursor: pointer; }
+.auth-options { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 0 7px; }
+.check-line { display: inline-flex; align-items: center; gap: 11px; color: #a5b0a5; font-size: 13px; cursor: pointer; }
+.check-line input { margin: 0; accent-color: #91b87b; }
+.auth-consent { margin: 11px 0 7px; }
+.auth-submit { width: 100%; height: 46px; margin-top: 11px; justify-content: space-between; padding: 0 17px; font-size: 13px; }
+.auth-switch { text-align: center; color: #879589; font-size: 12px; margin-top: 22px; }
+.auth-switch a { color: #b2ce9f; text-decoration: none; font-weight: 650; margin-left: 4px; }
+.auth-switch a:hover { color: #d0e2c7; }
+.auth-legal { color: #6e7c71; line-height: 1.6; font-size: 12px; text-align: center; max-width: 420px; margin: 0 auto; }
+.demo-hint { margin-top: 20px; padding: 11px 12px; border: 1px solid #4d4431; border-radius: 4px; background: #211f18; color: #ad9e7e; font-size: 13px; line-height: 1.55; }
+.demo-hint strong { color: #d2b47c; font-family: var(--mono); font-size: 12px; }
+.offline-hint { border-color: #554238; background: #211b18; color: #c09a83; }
+.form-error { border: 1px solid #70453f; background: #2b1e1b; color: #e1a69c; border-radius: 4px; padding: 11px 11px; font-size: 13px; line-height: 1.5; }
+
+/* Home dashboard */
+.hero-card { height: 348px; position: relative; overflow: hidden; border: 1px solid #354237; border-radius: 6px; background: #1c2a20; box-shadow: 0 12px 28px #070b081f; }
+.hero-image { position: absolute; inset: 0; background: #1c2a20 center 46% / cover no-repeat; filter: saturate(.83) brightness(.84); transform: scale(1.01); }
+.hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, #101812 0%, #111a14ed 26%, #111a148c 54%, #10181218 100%), linear-gradient(0deg, #101812c2 0%, transparent 44%); }
+.hero-topline { position: absolute; top: 18px; right: 18px; display: flex; align-items: center; gap: 12px; z-index: 1; }
+.hero-pill { border: 1px solid #83917b55; background: #121a15b5; border-radius: 3px; padding: 6px 11px; color: #c1cfb9; font: 12px var(--mono); letter-spacing: 1px; }
+.hero-pill i { display: inline-block; width: 5px; height: 5px; background: #9fbd8e; border-radius: 50%; margin-right: 7px; vertical-align: 1px; }
+.hero-content { position: relative; z-index: 1; padding: 38px 40px; max-width: 620px; }
+.hero-kicker { font-size: 12px; letter-spacing: 1.5px; color: #b4c4ac; display: flex; align-items: center; gap: 11px; }
+.hero-kicker > span { width: 6px; height: 6px; background: #a1c58e; border-radius: 50%; }
+.hero-kicker i { height: 1px; width: 22px; background: #71816e; }
+.hero-content h1 { font-size: 43px; line-height: 1.12; font-weight: 760; letter-spacing: -1.11px; margin: 27px 0 12px; color: #f0f4ef; }
+.hero-content h1 em { font-style: normal; color: #b1cd9e; }
+.hero-content > p { color: #b8c3b7; font-size: 13px; max-width: 395px; line-height: 1.75; margin: 0 0 22px; }
+.hero-actions { display: flex; align-items: center; gap: 21px; }
+.home-primary-action { height: 46px; padding: 0 21px; min-width: 190px; font-size: 13px; }
+.hero-secondary { display: inline-flex; align-items: center; gap: 11px; text-decoration: none; color: #d1dbd1; font: 12px var(--mono); letter-spacing: 1.1px; }
+.hero-secondary:hover { color: var(--accent); }
+.hero-footnote { display: flex; gap: 21px; margin-top: 24px; color: #a2afa2; font-size: 12px; letter-spacing: .11px; }
+.hero-footnote span { display: flex; align-items: center; gap: 6px; }
+.tiny-dot { width: 5px; height: 5px; box-shadow: none; }
+.hero-index { position: absolute; right: 24px; bottom: 20px; font-size: 12px; color: #e1e9df; }
+.hero-index span { color: #7f8d80; }
+.home-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 13px 0 31px; }
+.metric-card { height: 77px; border: 1px solid #2d3a31; background: #18211b; border-radius: 4px; display: flex; align-items: center; padding: 0 13px; gap: 11px; position: relative; min-width: 0; }
+.metric-icon { width: 31px; height: 31px; border: 1px solid #38483a; background: #202c22; color: #a2bd93; border-radius: 4px; display: grid; place-items: center; flex-shrink: 0; }
+.metric-card > div:nth-child(2) { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.metric-label { font-size: 12px; letter-spacing: .11px; color: #929f93; white-space: nowrap; }
+.metric-card strong { font-size: 17px; font-weight: 690; color: #e0e8df; letter-spacing: -.3px; }
+.metric-card strong small { font: 12px var(--mono); color: #839087; }
+.metric-caption, .metric-latency { margin-left: auto; font-size: 12px; color: #87958a; }
+.metric-caption { color: #9bad92; }
+.home-news-section { padding-bottom: 20px; }
+.news-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.news-card { min-height: 154px; display: flex; border: 1px solid #2d3a31; background: #18211b; border-radius: 5px; overflow: hidden; text-decoration: none; color: inherit; transition: border-color .18s ease, transform .18s ease, background .18s ease; }
+.news-card:hover, .news-list-card:hover { border-color: #61795b; transform: translateY(-2px); background: #1a251d; }
+.news-thumb { width: 38%; flex-shrink: 0; background-size: cover; background-position: center; filter: saturate(.82); }
+.news-card-content { padding: 14px 15px; min-width: 0; display: flex; flex-direction: column; }
+.news-meta { display: flex; align-items: center; gap: 12px; color: #829085; font-size: 12px; letter-spacing: .4px; }
+.news-meta > span { color: #a8c696; }
+.news-card h3 { font-size: 14px; line-height: 1.35; font-weight: 660; margin: 12px 0 6px; color: #e0e8df; }
+.news-card p { color: #94a095; font-size: 13px; line-height: 1.55; margin: 0; }
+.news-read { display: inline-flex; align-items: center; gap: 6px; color: #a7c496; font-size: 12px; letter-spacing: .11px; margin-top: auto; padding-top: 11px; }
+.home-operation { display: grid; grid-template-columns: 190px 1fr auto; gap: 17px; align-items: center; border: 1px solid #384a3b; background: #1a271d; border-radius: 4px; padding: 12px 15px; margin-top: 12px; }
+.home-operation > div:first-child { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.operation-kicker { color: #90a788; font-size: 12px; letter-spacing: .11px; }
+.home-operation strong { color: #dbe6d8; font-size: 12px; }
+.home-operation small { color: #859287; font: 12px var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.operation-meter { height: 4px; background: #344236; overflow: hidden; border-radius: 3px; }
+.operation-meter i { display: block; height: 100%; background: #91b87b; transition: width .18s ease; }
+.home-error { display: flex; align-items: center; gap: 11px; padding: 12px 13px; margin-top: 12px; border: 1px solid #704b42; background: #251d19; color: #d5a196; border-radius: 4px; font-size: 12px; }
+
+/* News and article details */
+.news-list { display: flex; flex-direction: column; gap: 12px; }
+.news-list-card { display: flex; min-height: 164px; border: 1px solid #2d3a31; background: #18211b; border-radius: 5px; overflow: hidden; text-decoration: none; color: inherit; transition: .18s; }
+.news-list-image { width: 260px; flex: 0 0 260px; background-size: cover; background-position: center; filter: saturate(.82); }
+.news-list-copy { padding: 20px 22px; display: flex; flex-direction: column; align-items: flex-start; }
+.news-list-copy h3 { font-size: 18px; line-height: 1.3; font-weight: 670; margin: 12px 0 6px; color: #e0e8df; }
+.news-list-copy p { font-size: 12px; color: #98a499; margin: 0 0 13px; line-height: 1.65; }
+.article-page { max-width: 900px; }
+.back-link { display: inline-flex; align-items: center; gap: 11px; color: #a5c395; text-decoration: none; font-size: 12px; letter-spacing: 1px; margin-bottom: 17px; }
+.article-cover { height: 280px; background-size: cover; background-position: center; border: 1px solid #344136; border-radius: 5px; }
+.article-body { max-width: 700px; margin: 27px auto; }
+.article-body h1 { font-size: 32px; font-weight: 720; letter-spacing: -.11px; margin: 14px 0; }
+.article-body p { color: #a4b0a5; font-size: 13px; line-height: 1.85; }
+.article-body .article-lead { font-size: 15px; color: #c0cbc0; }
+
+/* Modpack and settings */
+.release-chip { font-size: 12px; letter-spacing: .11px; color: #a9c49d; border: 1px solid #40533f; background: #1c2a20; padding: 7px 11px; border-radius: 3px; }
+.release-chip span { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #92b77e; margin-right: 6px; }
+.modpack-main-card, .modpack-status-card, .changelog-panel { border: 1px solid #2e3b32; background: #19221c; border-radius: 5px; }
+.modpack-main-card { overflow: hidden; }
+.modpack-card-art { background: linear-gradient(90deg, #111a14aa, #111a1430) center / cover no-repeat; }
+.modpack-main-copy { padding: 22px; }
+.version-big { font-size: 38px; font-weight: 740; letter-spacing: -1.3px; }
+.version-big span { font: 13px var(--mono); letter-spacing: .11px; color: #a2b19f; }
+.modpack-status-card { padding: 18px; }
+.changelog-panel { margin-top: 13px; padding: 20px 22px; }
+.modpack-footer { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-top: 17px; }
+.modpack-footer > div:first-child { display: flex; align-items: center; gap: 11px; color: #8e9b90; font-size: 13px; }
+.modpack-footer-actions { display: flex; gap: 11px; align-items: center; }
+.config-changes { font-size: 13px; color: #8e9d91; padding-top: 12px; border-top: 1px solid #2d392f; }
+.settings-content { border: 1px solid #2e3a31; background: #19221c; border-radius: 5px; }
+.settings-section { padding: 22px 24px; border-bottom: 1px solid #2d3930; }
+.settings-section:last-child { border: 0; }
+.settings-title h3 { font-size: 14px; font-weight: 660; }
+.settings-title p { font-size: 13px; line-height: 1.5; color: #89978c; }
+.setting-control > label, .setting-label label { font-size: 13px; color: #b3bfb4; }
+.path-input input, .resolution-fields input, .setting-control select { background: #111a14; border: 1px solid #39463c; border-radius: 4px; color: #d1dbd0; font-size: 12px; }
+.settings-feedback { display: flex; align-items: center; gap: 11px; padding: 12px 13px; border: 1px solid #40563f; background: #1c291f; color: #b5cea8; border-radius: 4px; margin-top: 13px; font-size: 12px; }
+.settings-feedback.is-error { border-color: #704b42; background: #251d19; color: #d5a196; }
+
+/* Installation diagnostics */
+.install-summary { padding: 22px; margin-bottom: 14px; }
+.install-summary-head { display: flex; align-items: center; gap: 13px; margin-bottom: 22px; }
+.install-icon { width: 42px; height: 42px; display: grid; place-items: center; background: #26362a; border: 1px solid #40533f; color: #a7c498; border-radius: 5px; }
+.install-summary-head h2 { margin: 4px 0 0; font-size: 18px; font-weight: 650; }
+.install-state-tag { margin-left: auto; border: 1px solid #68573b; background: #282318; color: #d2b47c; border-radius: 3px; padding: 6px 11px; font-size: 12px; letter-spacing: .11px; }
+.install-progress-label { display: flex; justify-content: space-between; align-items: center; color: #b8c5b6; font-size: 12px; margin-bottom: 11px; }
+.install-progress-label strong { color: #b3d09f; font: 13px var(--mono); }
+.install-progress-track { height: 7px; background: #303d32; border-radius: 4px; overflow: hidden; }
+.install-progress-track i { display: block; height: 100%; background: #8dae79; transition: width .2s ease; }
+.install-progress-details { display: flex; flex-wrap: wrap; gap: 14px 24px; margin-top: 12px; color: #849187; font-size: 12px; }
+.install-progress-details code { color: #b7c5b5; }
+.install-error { display: flex; align-items: center; gap: 11px; margin-top: 12px; padding: 12px; border: 1px solid #704b42; background: #251d19; color: #d5a196; border-radius: 4px; font-size: 13px; }
+.install-actions { display: flex; gap: 11px; flex-wrap: wrap; margin-top: 18px; }
+.cancel-operation { height: 39px; display: inline-flex; align-items: center; gap: 11px; padding: 0 14px; border: 1px solid #704b42; background: #261e1b; color: #d49b91; border-radius: 4px; font: 700 12px var(--mono); cursor: pointer; }
+.cancel-operation:disabled { opacity: .4; cursor: not-allowed; }
+.logs-panel { padding: 18px 20px; }
+.logs-panel .panel-heading { gap: 15px; }
+.logs-panel .panel-heading h2 { display: flex; align-items: center; gap: 11px; font-size: 15px; }
+.logs-actions { display: flex; align-items: center; gap: 7px; color: #829087; font-size: 12px; }
+.logs-actions .outline-button { height: 29px; padding: 0 11px; font-size: 12px; }
+.logs-list { min-height: 120px; max-height: 250px; overflow: auto; margin-top: 15px; background: #111813; border: 1px solid #2c382e; border-radius: 4px; padding: 11px 11px; }
+.logs-empty { display: flex; align-items: center; gap: 11px; min-height: 100px; justify-content: center; color: #77867a; font-size: 13px; }
+.log-row { display: grid; grid-template-columns: 72px 54px 1fr; align-items: baseline; gap: 11px; padding: 6px 0; border-bottom: 1px solid #202a22; color: #a8b4a8; font: 12px var(--mono); }
+.log-row:last-child { border-bottom: 0; }
+.log-row time { color: #738076; }
+.log-level { font-size: 12px; }
+.log-info { color: #9ab98b; }
+.log-warn { color: #c9aa70; }
+.log-error { color: #d18a7d; }
+.log-debug { color: #8c9ba1; }
+
+@media (max-width: 1120px) {
+  .home-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .auth-screen { grid-template-columns: minmax(0, 1fr) minmax(390px, .85fr); }
+  .auth-panel { padding-left: 30px; padding-right: 30px; }
+}
+@media (max-width: 900px) {
+  .auth-screen { grid-template-columns: .75fr 1fr; }
+  .auth-art { padding: 28px; }
+  .auth-art-copy h1 { font-size: 39px; }
+  .auth-panel { padding: 22px; }
+  .news-grid { grid-template-columns: 1fr; }
+  .home-operation { grid-template-columns: 1fr; gap: 12px; }
+  .install-progress-details { gap: 11px 14px; }
+}
+@media (max-width: 720px) {
+  .auth-screen { display: block; overflow: auto; }
+  .auth-art { min-height: 230px; padding: 22px; }
+  .auth-art-copy { margin: 28px 0 0; }
+  .auth-art-copy h1 { font-size: 32px; margin: 12px 0 11px; }
+  .auth-art-copy p, .auth-world-meta, .auth-art-footer { display: none; }
+  .auth-panel { min-height: 480px; border-left: 0; border-top: 1px solid #2b382d; }
+  .auth-form-wrap { padding: 28px 0; }
+  .hero-card { height: auto; min-height: 330px; }
+  .hero-content { padding: 31px 24px; }
+  .hero-content h1 { font-size: 36px; }
+  .hero-footnote { flex-wrap: wrap; gap: 12px; }
+  .home-metrics { grid-template-columns: 1fr 1fr; }
+  .news-card { min-height: 140px; }
+  .news-list-card { min-height: 140px; }
+  .news-list-image { width: 35%; flex-basis: 35%; }
+  .settings-layout { grid-template-columns: 1fr; }
+  .settings-nav { position: static; flex-direction: row; flex-wrap: wrap; }
+  .modpack-footer { align-items: flex-start; flex-direction: column; }
+  .modpack-footer-actions { width: 100%; }
+  .modpack-footer-actions > * { flex: 1; }
+  .change-columns { grid-template-columns: 1fr 1fr; }
+}
+
+/* Ensure the modern sans stack wins over legacy var(--font-sans) declarations in older component rules. */
+h1, h2, h3, h4, p, button, input, select, label, a, span, strong, b, small, time, code {
+  font-family: var(--font-sans) !important;
+}
+.eyebrow, .nav-label, .breadcrumb, .mock-badge, .server-mini-top, .server-mini-number small,
+.sidebar-version, .hero-kicker, .hero-footnote, .hero-index, .metric-label, .metric-trend,
+.metric-caption, .metric-latency, .news-meta, .news-read, .back-link, .release-chip,
+.status-card-head, .last-check, .update-size, .change-columns h4, .profile-id,
+.profile-status, .subtle-tag, .auth-overline, .auth-world-meta, .auth-art-footer,
+.auth-language, .operation-kicker, .install-state-tag, .install-progress-details, .log-level {
+  font-family: var(--mono) !important;
+}
+
+/* Readability pass — one real sans family for the product UI; mono is reserved for diagnostics. */
+:root {
+  --font-sans: 'Segoe UI Variable', 'Segoe UI', system-ui, 'Noto Sans', Arial, sans-serif;
+  --mono: 'Cascadia Code', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+}
+body { font-size: 14px; line-height: 1.5; }
+.sidebar { width: 236px; flex-basis: 236px; }
+.brand-name { font-size: 18px; letter-spacing: 1.11px; }
+.brand-sub { font-size: 12px; }
+.nav-label { font: 600 13px var(--font-sans) !important; letter-spacing: .12em; }
+.nav-link { height: 46px; font-size: 14px; gap: 13px; }
+.titlebar-brand { font-size: 13px; letter-spacing: 1.1px; }
+.titlebar-brand i { font-size: 13px; }
+.mock-badge { font: 600 12px var(--font-sans) !important; letter-spacing: .08em; padding: 6px 11px; }
+.section-heading h1 { font-size: 33px; letter-spacing: -.04em; }
+.section-heading p { font-size: 14px; }
+.section-row h2, .panel-heading h2 { font-size: 20px; letter-spacing: -.025em; }
+.primary-button, .outline-button { font: 650 13px var(--font-sans); letter-spacing: .035em; }
+
+/* Home — clearer hierarchy and less tiny all-caps UI. */
+.hero-card { height: 356px; }
+.hero-image { filter: saturate(.98) brightness(.9); }
+.hero-content { max-width: 690px; padding: 42px 44px; }
+.hero-kicker { font: 600 13px var(--font-sans) !important; letter-spacing: .12em; }
+.hero-content h1 { font-size: clamp(44px, 4vw, 54px); letter-spacing: -.045em; line-height: 1.06; margin: 24px 0 12px; }
+.hero-content > p { font-size: 15px; line-height: 1.7; max-width: 470px; }
+.home-primary-action { min-width: 200px; height: 50px; font-size: 13px; }
+.hero-secondary { font: 600 13px var(--font-sans) !important; letter-spacing: .035em; }
+.hero-footnote { font: 13px var(--font-sans) !important; letter-spacing: .04em; }
+.hero-pill { font: 13px var(--font-sans); letter-spacing: .05em; }
+.metric-card { height: 84px; gap: 13px; padding: 0 15px; }
+.metric-icon { width: 36px; height: 36px; }
+.metric-label { font: 600 13px var(--font-sans) !important; letter-spacing: .06em; }
+.metric-card strong { font-size: 20px; }
+.metric-card strong small, .metric-caption, .metric-latency { font: 13px var(--mono); }
+.news-card h3 { font-size: 16px; font-weight: 650; }
+.news-card p { font-size: 13px; line-height: 1.6; }
+.news-meta { font: 13px var(--font-sans) !important; letter-spacing: .01em; }
+.news-read { font: 600 13px var(--font-sans) !important; letter-spacing: .04em; }
+
+/* Auth — portrait Minecraft art, properly sized fields and an explicit one-click demo entry. */
+.auth-screen { grid-template-columns: minmax(0, 1.12fr) minmax(470px, .88fr); }
+.auth-art { padding: 46px 52px 30px; }
+.auth-art-image {
+  background-position: center center !important;
+  background-size: cover !important;
+  filter: saturate(1.04) brightness(.88) !important;
+  transform: none !important;
+}
+.auth-art-overlay { background: linear-gradient(90deg, rgba(10,17,12,.72) 0%, rgba(10,17,12,.35) 47%, rgba(10,17,12,.06) 100%), linear-gradient(0deg, rgba(10,16,12,.78), transparent 58%); }
+.auth-brand strong { font-size: 19px; letter-spacing: .12em; }
+.auth-brand small { font: 12px var(--font-sans); letter-spacing: .12em; }
+.auth-art-copy { margin-bottom: 64px; max-width: 620px; }
+.auth-art-copy .eyebrow { font: 600 12px var(--font-sans) !important; letter-spacing: .12em; }
+.auth-art-copy h1 { font-size: clamp(48px, 4.8vw, 70px); letter-spacing: -.055em; line-height: 1.02; }
+.auth-art-copy p { font-size: 15px; line-height: 1.75; max-width: 440px; }
+.auth-world-meta, .auth-art-footer { font: 13px var(--font-sans) !important; letter-spacing: .06em; }
+.auth-panel { padding: 26px clamp(28px, 4.2vw, 58px) 24px; }
+.auth-form-wrap { max-width: 460px; padding: 20px 0; }
+.auth-overline { font: 650 13px var(--font-sans) !important; letter-spacing: .13em; }
+.auth-form-wrap h2 { font-size: 34px; font-weight: 690; letter-spacing: -.045em; margin: 12px 0 11px; }
+.auth-subtitle { font-size: 14px; line-height: 1.65; margin-bottom: 20px; }
+.auth-form { gap: 11px; }
+.auth-form > label:not(.check-line) { font: 650 12px var(--font-sans) !important; letter-spacing: .06em; margin-top: 11px; }
+.auth-input-wrap { min-height: 52px; gap: 12px; padding: 0 15px; border-radius: 5px; }
+.auth-input-wrap svg { width: 18px; height: 18px; }
+.auth-input-wrap input { height: 50px; font-size: 15px; }
+.auth-input-wrap input::placeholder { color: #89968a; }
+.auth-options { margin: 7px 0 11px; }
+.check-line { font-size: 13px; }
+.auth-options .text-button { font-size: 13px; }
+.auth-submit { height: 51px; font-size: 13px; margin-top: 11px; }
+.auth-switch { font-size: 13px; margin-top: 17px; }
+.auth-legal { font-size: 12px; line-height: 1.65; max-width: 460px; }
+.demo-access {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  margin-top: 15px; padding: 13px 14px; border: 1px solid #536848;
+  border-radius: 5px; background: linear-gradient(110deg, #243323, #1a241c 72%);
+}
+.demo-access-copy { display: flex; min-width: 0; flex-direction: column; gap: 4px; }
+.demo-access-label { display: inline-flex; align-items: center; gap: 6px; color: #b6d39f; font: 700 13px var(--font-sans); letter-spacing: .1em; }
+.demo-access-copy strong { color: #edf3e9; font: 650 13px var(--font-sans); letter-spacing: .01em; }
+.demo-access-copy strong i { color: #71856f; font-style: normal; padding: 0 3px; }
+.demo-access-copy small { color: #9ca99a; font-size: 13px; line-height: 1.35; }
+.demo-access-button { flex: 0 0 auto; height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 11px; padding: 0 12px; border: 1px solid #769368; border-radius: 4px; background: #344a31; color: #e8f0e3; font: 700 13px var(--font-sans); letter-spacing: .035em; cursor: pointer; transition: background .15s ease, border-color .15s ease; }
+.demo-access-button:hover { background: #405b3b; border-color: #91b87b; }
+.demo-access-button:disabled { opacity: .55; cursor: wait; }
+.demo-hint { font: 13px/1.6 var(--font-sans); }
+.demo-hint strong { font: 700 12px var(--font-sans); }
+.form-error { font-size: 13px; }
+
+/* Secondary pages: readable controls without changing Heart's restrained surfaces. */
+.settings-title h3 { font-size: 16px; }
+.settings-title p, .setting-control > label, .setting-label label { font-size: 13px; }
+.path-input input, .resolution-fields input, .setting-control select { font-size: 13px; }
+.profile-data-row { font-size: 13px; }
+.news-list-copy p { font-size: 13px; }
+.install-progress-label { font-size: 13px; }
+.install-progress-details, .log-row { font-size: 13px; }
+
+@media (max-width: 1120px) {
+  .auth-screen { grid-template-columns: minmax(0, 1fr) minmax(430px, .95fr); }
+  .auth-panel { padding-left: 28px; padding-right: 28px; }
+}
+@media (max-width: 900px) {
+  .sidebar { width: 72px; flex-basis: 72px; }
+  .auth-screen { grid-template-columns: minmax(0, .9fr) minmax(400px, 1.1fr); }
+  .auth-art { padding: 30px 28px 24px; }
+  .auth-art-copy h1 { font-size: 46px; }
+  .demo-access { flex-direction: column; align-items: stretch; }
+  .demo-access-button { width: 100%; }
+}
+@media (max-width: 720px) {
+  .auth-screen { display: block; overflow: auto; }
+  .auth-art { min-height: 250px; }
+  .auth-art-image { background-position: center 40% !important; }
+  .auth-panel { padding: 22px; }
+  .demo-access { flex-direction: row; }
+}
+
+
+/* Readability pass: no important copy is rendered as tiny decorative microtype. */
+body { font-size: 14px; }
+body .titlebar-center,
+body .brand-sub,
+body .nav-label,
+body .eyebrow,
+body .breadcrumb,
+body .sidebar-version,
+body .server-mini-top,
+body .server-mini-number small,
+body .server-address,
+body .mock-badge,
+body .hero-kicker,
+body .hero-pill,
+body .hero-secondary,
+body .hero-footnote,
+body .metric-label,
+body .metric-caption,
+body .metric-latency,
+body .news-meta,
+body .news-read,
+body .auth-brand small,
+body .auth-world-meta,
+body .auth-art-footer,
+body .auth-overline,
+body .auth-form > label:not(.check-line),
+body .demo-access-label,
+body .demo-access-button,
+body .demo-access-copy small,
+body .settings-nav a,
+body .setting-help,
+body .range-labels,
+body .last-check,
+body .log-row,
+body .cancel-operation,
+body .back-link,
+body .status-card-head,
+body .file-status small,
+body .update-size,
+body .change-columns h4,
+body .profile-id,
+body .profile-status,
+body .subtle-tag {
+  font-size: 12px !important;
+}
+body .news-card p,
+body .news-list-copy p,
+body .settings-title p,
+body .setting-control > label,
+body .setting-label label,
+body .toggle-row p,
+body .profile-note,
+body .minecraft-unlinked p,
+body .modpack-footer > div,
+body .inline-progress > div:first-child,
+body .inline-progress button,
+body .form-error,
+body .auth-legal,
+body .auth-options .text-button {
+  font-size: 13px !important;
+}
+body .check-line,
+body .profile-data-row,
+body .profile-data-row b,
+body .toggle-row b,
+body .file-status b,
+body .change-columns p,
+body .auth-switch,
+body .demo-hint {
+  font-size: 13px !important;
+}
+body .log-row { line-height: 1.55; }
+body .hero-content > p,
+body .auth-art-copy p,
+body .article-body p,
+body .setting-help { line-height: 1.7; }
+
+
+/* Readability refinement — keep every useful label legible at desktop scale. */
+html { font-size: 16px; }
+body { font-size: 15px; line-height: 1.55; }
+.titlebar-center { font-size: 13px !important; }
+.brand-name { font-size: 18px; }
+.brand-sub { font-size: 12px !important; letter-spacing: .7px; }
+.nav-label, .eyebrow, .breadcrumb, .sidebar-version, .server-mini-top,
+.server-mini-number small, .server-address, .mock-badge, .hero-kicker,
+.hero-pill, .hero-secondary, .hero-footnote, .metric-label, .metric-caption,
+.metric-latency, .news-meta, .news-read, .back-link, .release-chip,
+.status-card-head, .last-check, .update-size, .change-columns h4,
+.profile-id, .profile-status, .subtle-tag, .operation-kicker,
+.install-state-tag, .install-progress-details, .log-level {
+  font-size: 12px !important;
+}
+.nav-link { font-size: 14px; min-height: 44px; }
+.server-mini-number { font-size: 24px; }
+.user-mini-info b { font-size: 13px; }
+.user-mini-info span { font-size: 12px; }
+.section-heading h1 { font-size: 32px; }
+.section-heading p, .settings-title p, .setting-help, .toggle-row p,
+.profile-note, .minecraft-unlinked p, .news-card p, .news-list-copy p,
+.article-body p, .hero-content > p, .auth-art-copy p, .empty-state {
+  font-size: 14px !important;
+  line-height: 1.65;
+}
+.section-row h2, .panel-heading h2 { font-size: 20px; }
+.inline-link { font-size: 13px; }
+.primary-button, .outline-button { font-size: 13px; letter-spacing: .35px; }
+.muted-note, .setting-control > label, .setting-label label,
+.setting-label strong, .toggle-row b, .profile-data-row,
+.profile-data-row b, .file-status b, .change-columns p,
+.auth-options .text-button, .check-line, .auth-switch, .demo-hint,
+.form-error, .auth-legal, .auth-submit, .demo-access-button,
+.demo-access-copy small, .auth-form > label:not(.check-line) {
+  font-size: 13px !important;
+}
+.auth-form-wrap h2 { font-size: 32px; }
+.auth-subtitle { font-size: 14px; }
+.auth-input-wrap { min-height: 50px; }
+.auth-input-wrap input { height: 48px; font-size: 14px; }
+.auth-form > label:not(.check-line) { letter-spacing: .25px; }
+.check-line { gap: 11px; }
+.auth-submit { height: 50px; }
+.demo-access-label, .demo-access-copy strong { font-size: 13px; }
+.demo-access-copy small { line-height: 1.5; }
+.hero-content h1 { font-size: clamp(40px, 4vw, 58px); }
+.metric-card strong { font-size: 18px; }
+.install-progress-label { font-size: 14px; }
+.install-progress-details, .log-row { font-size: 13px !important; line-height: 1.6; }
+.profile-data-row { min-height: 46px; }
+.settings-nav a { font-size: 13px !important; }
+.range-labels { font-size: 13px !important; }
+@media (max-width: 900px) {
+  .nav-link { min-height: 44px; }
+  .auth-form-wrap h2 { font-size: 29px; }
+}
+
+
+/* Typography scale v0.3: raise small copy and keep secondary labels readable at launcher distance. */
+:root { --type-micro: 12px; --type-caption: 13px; --type-body: 15px; --type-control: 14px; }
+body { font-size: 16px; line-height: 1.55; }
+.titlebar-center, .brand-sub, .nav-label, .eyebrow, .breadcrumb, .sidebar-version,
+.server-mini-top, .server-mini-number small, .server-address, .mock-badge, .hero-kicker,
+.hero-pill, .hero-secondary, .hero-footnote, .metric-label, .metric-caption, .metric-latency,
+.news-meta, .news-read, .back-link, .release-chip, .status-card-head, .last-check, .update-size,
+.change-columns h4, .profile-id, .profile-status, .subtle-tag, .operation-kicker,
+.install-state-tag, .install-progress-details, .log-level, .auth-overline, .auth-world-meta,
+.auth-art-footer, .auth-form > label:not(.check-line), .settings-nav a, .range-labels {
+  font-size: var(--type-micro) !important;
+}
+.section-heading p, .settings-title p, .setting-help, .toggle-row p, .profile-note,
+.minecraft-unlinked p, .news-card p, .news-list-copy p, .article-body p, .hero-content > p,
+.auth-art-copy p, .empty-state, .demo-access-copy small, .muted-note {
+  font-size: var(--type-body) !important; line-height: 1.65;
+}
+.setting-control > label, .setting-label label, .setting-label strong, .toggle-row b,
+.profile-data-row, .profile-data-row b, .file-status b, .change-columns p, .auth-options .text-button,
+.check-line, .auth-switch, .demo-hint, .form-error, .auth-legal, .auth-submit,
+.demo-access-button, .auth-form input:not([type=checkbox]), .path-input input,
+.resolution-fields input, .setting-control select { font-size: var(--type-control) !important; }
+.nav-link { font-size: 14px; min-height: 46px; }
+.primary-button, .outline-button { font-size: 14px; letter-spacing: .25px; }
+.inline-link { font-size: 14px; }
+.news-card h3, .news-list-copy h3 { font-size: 16px; }
+.metric-card strong { font-size: 19px; }
+.auth-form-wrap h2 { font-size: 33px; }
+.auth-subtitle { font-size: 15px; line-height: 1.6; }
+.auth-input-wrap { min-height: 52px; }
+.auth-input-wrap input { height: 50px; font-size: 15px !important; }
+.demo-access-label { font-size: 13px !important; }
+.demo-access-copy strong { font-size: 14px; }
+.install-progress-label { font-size: 15px; }
+.install-progress-details, .log-row { font-size: 13px !important; line-height: 1.65; }
+
+/* Focused visual cleanup from the user's reference: fewer labels, smaller headlines, local art. */
+.titlebar-center { display: none !important; }
+.titlebar-brand i { display: none; }
+.brand-lockup { padding-bottom: 30px; }
+.brand-sub, .nav-label, .sidebar-version > span, .server-address { display: none !important; }
+.sidebar-version { justify-content: flex-start; padding-top: 10px; }
+.topline { justify-content: flex-end; }
+.hero-card { height: 342px; background: #162219; }
+.hero-image { background-size: cover; background-position: center 54%; filter: saturate(.93) brightness(.9); }
+.hero-shade {
+  background: linear-gradient(90deg, rgba(11,18,13,.94) 0%, rgba(12,20,14,.86) 29%, rgba(12,20,14,.48) 59%, rgba(12,20,14,.08) 100%),
+              linear-gradient(0deg, rgba(11,18,13,.65), transparent 42%);
+}
+.hero-content { max-width: 640px; padding: 42px 44px 30px; }
+.hero-content h1 { font-size: clamp(36px, 3.05vw, 44px); line-height: 1.08; letter-spacing: -.04em; font-weight: 740; margin: 0 0 13px; }
+.hero-content > p { max-width: 440px; font-size: 15px; line-height: 1.65; margin-bottom: 21px; }
+.hero-actions { gap: 19px; }
+.home-primary-action { min-width: 180px; height: 49px; font-size: 14px; letter-spacing: .025em; }
+.hero-secondary { font-size: 13px; font-family: var(--font-sans) !important; letter-spacing: .015em; }
+.hero-build { display: flex; align-items: center; gap: 10px; margin-top: 26px; color: #afbeae; font-size: 13px; }
+.hero-build span { width: 3px; height: 3px; border-radius: 50%; background: #91b87b; }
+.hero-kicker, .hero-pill, .hero-index, .hero-footnote { display: none !important; }
+.home-metrics { margin-top: 13px; margin-bottom: 29px; }
+.metric-card { min-height: 78px; }
+.metric-label { font: 600 12px var(--font-sans) !important; letter-spacing: .035em; }
+.metric-card strong { font-size: 20px; }
+.metric-card strong small, .metric-latency { font: 13px var(--font-sans) !important; }
+.section-row { align-items: center; margin-bottom: 15px; }
+.section-row h2 { font-size: 19px; margin: 0; }
+.news-card { min-height: 154px; }
+.news-card h3 { font-size: 16px; }
+.news-card p { font-size: 14px; }
+.news-meta, .news-read { font-family: var(--font-sans) !important; font-size: 12px; }
+.auth-art-image { background-position: center 48% !important; background-size: cover !important; }
+.auth-art-copy { bottom: 15%; max-width: 490px; }
+.auth-art-copy h1 { font-size: clamp(36px, 3.6vw, 50px); line-height: 1.06; letter-spacing: -.045em; margin: 0 0 12px; }
+.auth-art-copy p { font-size: 15px; max-width: 390px; }
+.auth-world-meta, .auth-art-footer, .auth-overline, .auth-language { display: none !important; }
+.auth-form-wrap h2 { font-size: 27px; }
+.auth-subtitle { font-size: 15px; }
+.auth-form > label:not(.check-line) { font-size: 13px !important; font-family: var(--font-sans) !important; letter-spacing: .025em !important; }
+.auth-input-wrap input { font-size: 15px; }
+.auth-switch { font-size: 14px; }
+.section-heading h1 { font-size: 27px; letter-spacing: -.025em; }
+.section-heading p { font-size: 15px; }
+.eyebrow { display: none !important; }
+.panel-heading h2, .panel-heading h3 { font-size: 17px; }
+@media (max-width: 900px) {
+  .hero-card { height: 315px; }
+  .hero-content { padding: 30px 28px; }
+  .hero-content h1 { font-size: 36px; }
+  .auth-art-copy h1 { font-size: 38px; }
+}
+@media (max-width: 720px) {
+  .hero-card { min-height: 300px; }
+  .hero-content h1 { font-size: 33px; }
+  .hero-build { flex-wrap: wrap; }
+}
+
+/* Bump secondary UI copy without making the main headings dominate. */
+body { font-size: 15px; }
+.nav-link { font-size: 15px; }
+.server-mini-top, .server-mini-number small, .server-live, .sidebar-version, .user-mini-info span { font-size: 13px; }
+.metric-label, .metric-caption, .metric-latency { font-size: 13px !important; }
+.news-meta, .news-read, .inline-link, .section-heading p { font-size: 13px; }
+.install-progress-label, .install-progress-details, .logs-actions, .log-row, .log-level { font-size: 12px; }
+
+
+/* Final heading scale: keep hierarchy compact and close to the supplied reference. */
+.hero-content h1 { font-size: clamp(34px, 2.85vw, 41px) !important; line-height: 1.1; }
+.auth-art-copy h1 { font-size: clamp(32px, 3vw, 42px) !important; line-height: 1.08; }
+.auth-form-wrap h2 { font-size: 26px !important; }
+.section-heading h1 { font-size: 26px !important; }
+.panel-heading h2, .panel-heading h3 { font-size: 17px !important; }
+@media (max-width: 900px) {
+  .hero-content h1 { font-size: 36px !important; }
+  .auth-art-copy h1 { font-size: 36px !important; }
+}

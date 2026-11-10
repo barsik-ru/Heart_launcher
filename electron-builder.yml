@@ -1,0 +1,50 @@
+appId: com.heart.launcher
+productName: Heart Launcher
+
+# Настройки автообновлений через GitHub Releases
+publish:
+  provider: github
+  owner: barsik-ru
+  repo: Heart_launcher
+  releaseType: release
+
+directories:
+  buildResources: build
+  output: release
+
+files:
+  - out/**/*
+  - package.json
+
+extraResources:
+  - from: resources/heart-identity-fabric.jar
+    to: heart-identity-fabric.jar
+  - from: build/icon.ico
+    to: icon.ico
+
+win:
+  icon: build/icon.ico
+  target:
+    - target: nsis
+      arch: [x64]
+
+nsis:
+  oneClick: false
+  perMachine: true
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: "Heart Launcher"
+  uninstallDisplayName: "Heart Launcher"
+  runAfterFinish: true
+  deleteAppDataOnUninstall: false
+
+  # Иконки
+  installerIcon: build/icon.ico
+  uninstallerIcon: build/icon.ico
+  installerHeaderIcon: build/icon.ico
+
+  # Тёмные графические баннеры установщика
+  installerHeader: build/installerHeader.bmp
+
+  artifactName: "Heart-Launcher-Setup-${version}.${ext}"
