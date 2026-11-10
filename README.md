@@ -9,9 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/barsik-ru/Heart_launcher/releases">
-    <img src="https://img.shields.io/github/v/release/barsik-ru/Heart_launcher?style=for-the-badge&color=89ad75&label=Релиз" alt="Latest Release" />
-  </a>
+  
   <img src="https://img.shields.io/badge/Minecraft-1.21.11-green?style=for-the-badge&logo=minecraft&logoColor=white" alt="Minecraft 1.21.11" />
   <img src="https://img.shields.io/badge/Fabric-0.19.5-blue?style=for-the-badge" alt="Fabric Loader" />
   <img src="https://img.shields.io/badge/Electron-33-47848F?style=for-the-badge&logo=electron&logoColor=white" alt="Electron 33" />
@@ -28,19 +26,19 @@
 
 ---
 
-## ✨ Особенности
+##  Особенности
 
-* 🚀 **Мгновенный старт:** Автоматическая установка портативной **Java 21**, клиента **Minecraft 1.21.11** и **Fabric Loader 0.19.5** в один клик.
-* 🔄 **Автообновление:** Лаунчер автоматически проверяет наличие новых версий на GitHub Releases и обновляется в фоне.
-* 📦 **Умная синхронизация модов (HeartBridge):** Скачивание и актуализация сборки клиентских модов и ресурс-паков напрямую с сервера и Modrinth с валидацией хешей SHA-1 / SHA-512.
-* 🎨 **Кастомные скины прямо в лаунчере:** Поддержка скинов (Classic 4px и Slim 3px) и плащей с предпросмотром модели персонажа в реальном времени.
-* 🛡️ **Heart Identity Link:** Безопасный беспарольный вход на сервер через генерацию одноразовых сессионных грантов.
-* 🎭 **5 уникальных тем оформления:** Heart, Obsidian, Crimson, Ocean, Amethyst + поддержка кастомного пиксельного шрифта *Minecraft Rus*.
-* ⚡ **Низкое потребление памяти:** Оптимизированный Electron runtime с жестким контролем фоновых процессов и кэшированием ассетов.
+*  **Мгновенный старт:** Автоматическая установка портативной **Java 21**, клиента **Minecraft 1.21.11** и **Fabric Loader 0.19.5** в один клик.
+*  **Автообновление:** Лаунчер автоматически проверяет наличие новых версий на GitHub Releases и обновляется в фоне.
+*  **Умная синхронизация модов (HeartBridge):** Скачивание и актуализация сборки клиентских модов и ресурс-паков напрямую с сервера и Modrinth с валидацией хешей SHA-1 / SHA-512.
+*  **Кастомные скины прямо в лаунчере:** Поддержка скинов (Classic 4px и Slim 3px) и плащей с предпросмотром модели персонажа в реальном времени.
+*  **Heart Identity Link:** Безопасный беспарольный вход на сервер через генерацию одноразовых сессионных грантов.
+*  **5 уникальных тем оформления:** Heart, Obsidian, Crimson, Ocean, Amethyst + поддержка кастомного пиксельного шрифта *Minecraft Rus*.
+*  **Низкое потребление памяти:** Оптимизированный Electron runtime с жестким контролем фоновых процессов и кэшированием ассетов.
 
 ---
 
-## 📸 Скриншоты
+##  Скриншоты
 
 <table align="center">
   <tr>
