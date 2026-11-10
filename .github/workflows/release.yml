@@ -10,7 +10,12 @@ permissions:
 
 jobs:
   release:
-    runs-on: windows-latest
+    # Запускаем сборку параллельно на Windows и Linux
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout repository
@@ -30,8 +35,18 @@ jobs:
           npm run typecheck
           npm test
 
-      - name: Build and Publish
+      # Этот шаг сработает только на сервере Windows
+      - name: Build and Publish (Windows)
+        if: matrix.os == 'windows-latest'
         env:
           VITE_USE_MOCKS: 'false'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run build:win -- --publish always
+
+      # Этот шаг сработает только на сервере Linux
+      - name: Build and Publish (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        env:
+          VITE_USE_MOCKS: 'false'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run build:linux -- --publish always
