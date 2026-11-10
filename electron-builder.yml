@@ -21,6 +21,8 @@ extraResources:
     to: heart-identity-fabric.jar
   - from: build/icon.ico
     to: icon.ico
+  - from: build/icon.png
+    to: icon.png
 
 win:
   icon: build/icon.ico
@@ -48,3 +50,16 @@ nsis:
   installerHeader: build/installerHeader.bmp
 
   artifactName: "Heart-Launcher-Setup-${version}.${ext}"
+
+linux:
+  icon: build/icon.png
+  target:
+    - target: AppImage
+    - target: deb
+  category: Game
+  maintainer: "Heart Launcher Team"
+  executableName: "heart-launcher"
+  desktop:
+    Name: "Heart Launcher"
+    Comment: "Heart Minecraft Launcher"
+    Categories: "Game;"

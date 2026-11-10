@@ -24,6 +24,11 @@ if (process.platform === 'win32') {
   app.setAppUserModelId('com.heart.launcher')
 }
 
+// Нативная поддержка Wayland для современных Linux-систем
+if (process.platform === 'linux') {
+  app.commandLine.appendSwitch('ozone-platform-hint', 'auto')
+}
+
 // Флаги оптимизации потребления памяти Electron
 app.commandLine.appendSwitch('disable-background-timer-throttling')
 app.commandLine.appendSwitch('disable-renderer-backgrounding')
@@ -106,9 +111,11 @@ if (!hasSingleInstanceLock) {
       ? join(process.resourcesPath, 'heart-identity-fabric.jar')
       : join(app.getAppPath(), 'resources', 'heart-identity-fabric.jar')
 
+    // На Linux используем .png, на Windows .ico
+    const iconExt = process.platform === 'linux' ? 'icon.png' : 'icon.ico'
     const windowIconPath = app.isPackaged
-      ? join(process.resourcesPath, 'icon.ico')
-      : join(app.getAppPath(), 'build', 'icon.ico')
+      ? join(process.resourcesPath, iconExt)
+      : join(app.getAppPath(), 'build', iconExt)
 
     let serviceMode: 'demo' | 'backend' | 'offline' = 'offline'
     let services: Services = {

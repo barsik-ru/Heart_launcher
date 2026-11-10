@@ -9,6 +9,7 @@
     "build": "node scripts/check-production.mjs && electron-vite build && electron-builder",
     "build:app": "electron-vite build",
     "build:win": "node scripts/check-production.mjs && electron-vite build && electron-builder --win nsis",
+    "build:linux": "node scripts/check-production.mjs && electron-vite build && electron-builder --linux",
     "preview": "electron-vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",
     "lint": "eslint .",
