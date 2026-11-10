@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const loginSchema = z.object({
   username: z.string().trim().min(3).max(16),
-  password: z.string().min(1).max(128).optional().default('offline123'),
+  password: z.string().min(8).max(128).optional().default('offline123'),
   remember: z.boolean().default(true)
 })
 

@@ -35,7 +35,7 @@ export function createPersistentSettingsService(filePath: string): SettingsServi
       const previous = parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : {}
       const merged: Record<string, unknown> = { ...defaultLauncherSettings, ...previous }
       if (merged.theme === 'dark' || merged.theme === 'system') merged.theme = 'verdant'
-      if (typeof merged.setupComplete !== 'boolean') {
+      if (typeof previous.setupComplete !== 'boolean') {
         merged.setupComplete = Object.keys(previous).length > 0
       }
       return launcherSettingsSchema.parse(merged)
