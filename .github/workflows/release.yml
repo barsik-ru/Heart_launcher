@@ -1,52 +1,37 @@
-﻿name: Build & Release
+﻿name: Build Desktop
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - 'v*'
 
-permissions:
-  contents: write
-
 jobs:
-  release:
-    # Запускаем сборку параллельно на Windows и Linux
-    strategy:
-      matrix:
-        os: [windows-latest, ubuntu-latest]
-        
-    runs-on: ${{ matrix.os }}
-
+  build-linux:
+    runs-on: ubuntu-22.04
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
 
-      - name: Install dependencies
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Install npm deps
         run: npm ci
 
-      - name: Run checks & tests
-        run: |
-          npm run typecheck
-          npm test
+      - name: Build Tauri (Linux)
+        run: npx tauri build --bundles appimage,deb
 
-      # Этот шаг сработает только на сервере Windows
-      - name: Build and Publish (Windows)
-        if: matrix.os == 'windows-latest'
-        env:
-          VITE_USE_MOCKS: 'false'
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run build:win -- --publish always
-
-      # Этот шаг сработает только на сервере Linux
-      - name: Build and Publish (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        env:
-          VITE_USE_MOCKS: 'false'
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run build:linux -- --publish always
+      - uses: actions/upload-artifact@v4
+        with:
+          name: heart-launcher-linux
+          path: |
+            src-tauri/target/release/bundle/appimage/*.AppImage
+            src-tauri/target/release/bundle/deb/*.deb
