@@ -6,6 +6,7 @@ import { AuthPage } from '../pages/AuthPage'
 import { HomePage } from '../pages/HomePage'
 import { NewsPage } from '../pages/NewsPage'
 import { ModpackPage } from '../pages/ModpackPage'
+import { DonatePage } from '../pages/DonatePage'
 import { ProfilePage } from '../pages/ProfilePage'
 import { SettingsPage } from '../pages/SettingsPage'
 import { InstallationPage } from '../pages/InstallationPage'
@@ -13,10 +14,11 @@ import { useAppStore } from '../stores/app-store'
 import { services } from '../services/container'
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import { AppearanceSetup } from '../components/AppearanceSetup'
+import { UpdateBanner } from '../components/UpdateBanner'
 
 function Protected({ children }: { children: ReactNode }) {
   const profile = useAppStore(state => state.profile)
-  return profile ? children : <Navigate to="/login" replace/>
+  return profile ? children : <Navigate to="/login" replace />
 }
 
 export function App() {
@@ -45,21 +47,23 @@ export function App() {
       >
         <HashRouter>
           <Routes>
-            <Route path="/login" element={profile ? <Navigate to="/" replace/> : <AuthPage/>}/>
-            <Route path="/register" element={profile ? <Navigate to="/" replace/> : <AuthPage mode="register"/>}/>
-            <Route element={<Protected><AppLayout/></Protected>}>
-              <Route path="/" element={<HomePage/>}/>
-              <Route path="/news" element={<NewsPage/>}/>
-              <Route path="/news/:id" element={<NewsPage/>}/>
-              <Route path="/modpack" element={<ModpackPage/>}/>
-              <Route path="/installation" element={<InstallationPage/>}/>
-              <Route path="/profile" element={<ProfilePage/>}/>
-              <Route path="/settings" element={<SettingsPage/>}/>
+            <Route path="/login" element={profile ? <Navigate to="/" replace /> : <AuthPage />} />
+            <Route path="/register" element={profile ? <Navigate to="/" replace /> : <AuthPage mode="register" />} />
+            <Route element={<Protected><AppLayout /></Protected>}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/news" element={<NewsPage />} />
+              <Route path="/news/:id" element={<NewsPage />} />
+              <Route path="/modpack" element={<ModpackPage />} />
+              <Route path="/donate" element={<DonatePage />} />
+              <Route path="/installation" element={<InstallationPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/settings" element={<SettingsPage />} />
             </Route>
-            <Route path="*" element={<Navigate to={profile ? '/' : '/login'} replace/>}/>
+            <Route path="*" element={<Navigate to={profile ? '/' : '/login'} replace />} />
           </Routes>
         </HashRouter>
-        {settings && !settings.setupComplete && <AppearanceSetup settings={settings} onComplete={setSettings}/>}
+        <UpdateBanner />
+        {settings && !settings.setupComplete && <AppearanceSetup settings={settings} onComplete={setSettings} />}
       </div>
     </ErrorBoundary>
   )

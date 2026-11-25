@@ -240,6 +240,14 @@ export class MinecraftLauncherService implements LauncherService {
         this.companionVerified = true
         return true
       }
+      // Гарантируем установку исправленного heart-overlay-1.0.0.jar (фикс мышки и borderless для Windows 11)
+      try {
+        const overlaySource = join(dirname(companionSource), 'heart-overlay-1.0.0.jar')
+        const overlayTarget = join(modsDir, 'heart-overlay-1.0.0.jar')
+        if (existsSync(overlaySource)) {
+          copyFileSync(overlaySource, overlayTarget)
+        }
+      } catch {}
     }
 
     this.companionVerified = existsSync(targetFile)
@@ -1036,8 +1044,9 @@ export class MinecraftLauncherService implements LauncherService {
       try {
         const { screen } = await import('electron')
         const primary = screen.getPrimaryDisplay()
-        targetWidth = primary.bounds.width
-        targetHeight = primary.bounds.height
+        const scale = primary.scaleFactor || 1
+        targetWidth = Math.round(primary.bounds.width * scale)
+        targetHeight = Math.round(primary.bounds.height * scale)
       } catch {}
 
       jvmArgs.push('-Dheart.borderless=true')
@@ -1077,6 +1086,7 @@ export class MinecraftLauncherService implements LauncherService {
     const child = spawn(javaBinaryPath, fullArgs, {
       cwd: gameDir,
       detached: false,
+      windowsHide: true,
       stdio: ['ignore', 'pipe', 'pipe']
     })
 

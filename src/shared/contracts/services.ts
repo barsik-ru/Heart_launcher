@@ -2,6 +2,11 @@ import type {
   AppUpdateProgress,
   AppUpdateStatus,
   AuthResult,
+  DonateCatalog,
+  DonateCreateOrderInput,
+  DonateCreateOrderResponse,
+  DonateMarkPaidInput,
+  DonateOrder,
   GameLogEvent,
   GameProcessEvent,
   InstallationInfo,
@@ -24,6 +29,7 @@ export interface AuthService {
   login(input: LoginInput): Promise<AuthResult>
   logout(): Promise<void>
   getProfile(): Promise<UserProfile | null>
+  syncProfile?(): Promise<UserProfile | null>
   updateProfile(input: UpdateProfileInput): Promise<UserProfile>
   linkMicrosoft(): Promise<MinecraftLinkStatus>
   unlinkMicrosoft(): Promise<void>
@@ -76,6 +82,14 @@ export interface UpdaterService {
   onProgress(callback: (progress: AppUpdateProgress) => void): () => void
 }
 
+export interface DonateService {
+  getCatalog(): Promise<DonateCatalog>
+  getOrders(): Promise<DonateOrder[]>
+  createOrder(input: DonateCreateOrderInput): Promise<DonateCreateOrderResponse>
+  markPaid(input: DonateMarkPaidInput): Promise<DonateOrder>
+  getOrderStatus(orderId: string): Promise<DonateOrder>
+}
+
 export interface Services {
   auth: AuthService
   news: NewsService
@@ -83,4 +97,5 @@ export interface Services {
   settings: SettingsService
   launcher: LauncherService
   updater: UpdaterService
+  donate?: DonateService
 }

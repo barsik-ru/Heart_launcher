@@ -17,15 +17,31 @@ export class OfflineAuthService implements AuthService {
     this.loadSession()
   }
 
+  private normalizeIsoDate(raw?: string | null): string {
+    const trimmed = (raw ?? '').trim()
+    if (!trimmed || trimmed.toLowerCase() === 'invalid date') return new Date().toISOString()
+    if (trimmed.includes('04 нояб') && trimmed.includes('2026')) return '2026-11-04T00:00:00.000Z'
+    const parsed = new Date(trimmed)
+    return Number.isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString()
+  }
+
   private loadSession() {
     try {
       if (existsSync(this.sessionPath)) {
         const raw = JSON.parse(readFileSync(this.sessionPath, 'utf8')) as OfflineStorageData | UserProfile
         if ('accounts' in raw && Array.isArray(raw.accounts)) {
-          this.savedAccounts = raw.accounts
+          let dirty = false
+          this.savedAccounts = raw.accounts.map(acc => {
+            const fixedReg = this.normalizeIsoDate(acc.registeredAt)
+            if (fixedReg !== acc.registeredAt) dirty = true
+            return { ...acc, registeredAt: fixedReg }
+          })
           this.currentProfile = this.savedAccounts.find(a => a.id === raw.activeId) || this.savedAccounts[0] || null
+          if (dirty) this.saveSession()
         } else if ('username' in raw) {
-          this.currentProfile = raw as UserProfile
+          const single = raw as UserProfile
+          single.registeredAt = this.normalizeIsoDate(single.registeredAt)
+          this.currentProfile = single
           this.savedAccounts = [this.currentProfile]
           this.saveSession()
         }

@@ -39,11 +39,26 @@ export function SettingsPage() {
   useEffect(() => {
     let active = true
     void services.settings.getSettings()
-      .then(value => {
+      .then(async value => {
         if (!active) return
-        setSettings(value)
-        setSavedSettings(value)
-        setGlobalSettings(value)
+        let resolved = value
+        if (!value.setupComplete || value.width < 640 || value.height < 480) {
+          try {
+            const res = await window.launcher?.system.getScreenResolution()
+            if (res && res.width >= 640 && res.height >= 480) {
+              resolved = await services.settings.updateSettings({
+                ...value,
+                width: res.width,
+                height: res.height,
+                setupComplete: true
+              })
+            }
+          } catch {}
+        }
+        if (!active) return
+        setSettings(resolved)
+        setSavedSettings(resolved)
+        setGlobalSettings(resolved)
         setSettingsDirty(false)
       })
       .catch(cause => {
@@ -136,11 +151,21 @@ export function SettingsPage() {
   }
 
   const detectResolution = async () => {
+    if (!settings) return
+    setError('')
     try {
       const res = await window.launcher?.system.getScreenResolution()
       if (res && res.width && res.height) {
-        update({ width: res.width, height: res.height })
-        setMessage(`Разрешение экрана определено: ${res.width}×${res.height}`)
+        const patched = { ...settings, width: res.width, height: res.height, setupComplete: true }
+        setSettings(patched)
+        setGlobalSettings(patched)
+        const next = await services.settings.updateSettings(patched)
+        setSettings(next)
+        setSavedSettings(next)
+        setGlobalSettings(next)
+        setSettingsDirty(false)
+        setSaved(true)
+        setMessage(`Разрешение экрана установлено и сохранено: ${res.width}×${res.height}`)
       }
     } catch {
       setError('Не удалось определить разрешение экрана.')
@@ -356,6 +381,16 @@ export function SettingsPage() {
             <div className="settings-title"><SlidersHorizontal size={17} /><div><h3>{t.advanced}</h3><p>{t.advancedDescription}</p></div></div>
             <div className="advanced-actions">
               <button className="outline-button" type="button" onClick={() => void window.launcher?.system.openGameFolder()}><FolderOpen size={14}/> {t.openGameFolder}</button>
+              <button
+                className="outline-button"
+                type="button"
+                onClick={() => void services.updater.checkForUpdates().then(res => {
+                  if (res.state === 'not-available') setMessage(`Установлена последняя версия (v${res.currentVersion}).`)
+                  else if (res.state === 'error' && res.error) setError(res.error)
+                })}
+              >
+                <RotateCcw size={14}/> Проверить обновления
+              </button>
             </div>
             <button className="text-button reset-button" type="button" onClick={() => void reset()}><RotateCcw size={13}/> {t.resetDefaults}</button>
           </section>

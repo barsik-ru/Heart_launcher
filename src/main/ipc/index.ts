@@ -67,13 +67,17 @@ export function registerIpc(getWindow: () => BrowserWindow | null, services: Ser
   })
   handleVoid(IPC_CHANNELS.appGetInfo, (): AppInfo => ({ version: app.getVersion(), platform: process.platform, isPackaged: app.isPackaged, serviceMode }))
   
-  // Автоподбор разрешения экрана
+  // Автоподбор физического разрешения экрана (с учётом масштабирования DPI ноутбуков 125%/150%)
   handleVoid('system:getScreenResolution', () => {
     try {
-      const primary = screen.getPrimaryDisplay()
+      const win = getWindow()
+      const display = win && !win.isDestroyed()
+        ? screen.getDisplayMatching(win.getBounds())
+        : screen.getPrimaryDisplay()
+      const scale = display.scaleFactor || 1
       return {
-        width: primary.bounds.width,
-        height: primary.bounds.height
+        width: Math.round(display.bounds.width * scale),
+        height: Math.round(display.bounds.height * scale)
       }
     } catch {
       return { width: 1920, height: 1080 }

@@ -46,9 +46,12 @@
   pointer-events: none;
   background: linear-gradient(90deg, transparent, #c6e3a512, transparent);
   transform: skewX(-22deg);
-  animation: titlebar-glint 14s ease-in-out infinite;
+  display: none !important; /* Отключен бесконечный блик */
 }
-.titlebar-brand svg { color: #b6d49b; animation: title-heart-beat 5s ease-in-out infinite; }
+.titlebar-brand svg { 
+  color: #b6d49b; 
+  animation: none !important; /* Отключено бесконечное биение */
+}
 .window-actions button { transition: background .18s ease, color .18s ease, transform .18s ease; }
 .window-actions button:active { transform: scale(.88); }
 
@@ -129,17 +132,19 @@
   background: #19261c;
   box-shadow: 0 16px 34px #03070455, inset 0 1px #e1f0ce13;
   isolation: isolate;
+  contain: paint !important;
+  transform: translateZ(0);
 }
 .hero-image {
-  transform: scale(1.025);
-  transform-origin: 58% 48%;
-  animation: landscape-drift 26s ease-in-out infinite alternate;
+  transform: none !important; /* Убран дрифт, вызывавший вылезание рамки на доли секунды */
+  animation: none !important;
   filter: saturate(1.04) brightness(.86);
 }
 .hero-shade {
   background:
     linear-gradient(90deg, #0b130eeb 0%, #0c160fce 31%, #10201470 61%, #0c160f12 100%),
     linear-gradient(0deg, #0b120ed1 0%, transparent 48%);
+  inset: 0 !important;
 }
 .hero-content { padding: 42px 44px 34px; }
 .hero-content h1 {
@@ -315,13 +320,6 @@ input:focus, select:focus, textarea:focus { border-color: #88a96e !important; bo
   letter-spacing: .22em;
 }
 
-@keyframes titlebar-glint {
-  0%, 72% { left: -34%; opacity: 0; }
-  78% { opacity: .8; }
-  91%, 100% { left: 120%; opacity: 0; }
-}
-@keyframes title-heart-beat { 0%, 100% { transform: scale(1); } 12% { transform: scale(1.13); } 24% { transform: scale(1); } 36% { transform: scale(1.09); } 48% { transform: scale(1); } }
-@keyframes landscape-drift { from { transform: scale(1.025) translate3d(-.25%, 0, 0); } to { transform: scale(1.09) translate3d(.35%, -1%, 0); } }
 @keyframes heart-hover { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-3px) scale(1.045); } }
 @keyframes heart-impact {
   0% { opacity: .75; transform: translate(-50%, -50%) scale(.2); }
@@ -569,17 +567,6 @@ input:focus, select:focus, textarea:focus { border-color: #88a96e !important; bo
 }
 @media (prefers-reduced-motion: reduce) {
   .route-page { transform: none !important; }
-}
-
-.startup-heart-wrap svg { width: 42px; height: 42px; display: block; animation: startup-heartbeat 1.55s 1.05s ease-in-out 1; transform-origin: 50% 50%; }
-@keyframes startup-heartbeat {
-  0%, 100% { transform: scale(1); }
-  13% { transform: scale(1.18); }
-  25% { transform: scale(1); }
-  39% { transform: scale(1.13); }
-  52% { transform: scale(1); }
-  65% { transform: scale(1.16); }
-  78% { transform: scale(1); }
 }
 
 .button-spinner { animation: button-spin .9s linear infinite; }

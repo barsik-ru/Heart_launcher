@@ -225,3 +225,64 @@ export interface PathSelection {
   kind: 'file' | 'directory'
   path: string | null
 }
+
+export type DonatePaymentMethod = 'sbp_phone' | 'card'
+export type DonateOrderStatus = 'pending' | 'awaiting_verification' | 'paid' | 'cancelled'
+
+export interface DonatePaymentInfo {
+  enabled: boolean
+  mode: string
+  phoneNumber: string
+  cardNumber: string
+  bankName: string
+  recipientName: string
+  notice: string
+}
+
+export interface DonateProduct {
+  id: string
+  title: string
+  category: 'rank' | 'kit' | string
+  badge?: string | null
+  priceRub: number
+  durationLabel: string
+  description: string
+  perks: string[]
+  rankGroupName?: string | null
+}
+
+export interface DonateCatalog {
+  stubMode: boolean
+  payment: DonatePaymentInfo
+  products: DonateProduct[]
+}
+
+export interface DonateOrder {
+  id: string
+  username: string
+  productId: string
+  productTitle: string
+  category: string
+  amountRub: number
+  paymentMethod: DonatePaymentMethod | string
+  status: DonateOrderStatus | string
+  payerNote: string
+  createdAt: string
+  expiresAt: string
+  paidAt?: string | null
+}
+
+export interface DonateCreateOrderInput {
+  productId: string
+  paymentMethod: DonatePaymentMethod
+}
+
+export interface DonateMarkPaidInput {
+  orderId: string
+  payerNote: string
+}
+
+export interface DonateCreateOrderResponse {
+  order: DonateOrder
+  payment: DonatePaymentInfo
+}

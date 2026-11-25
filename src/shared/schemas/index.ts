@@ -1,17 +1,31 @@
 import { z } from 'zod'
 
+const usernameSchema = z
+  .string()
+  .trim()
+  .min(3, 'Логин должен быть от 3 до 16 символов')
+  .max(16, 'Логин должен быть от 3 до 16 символов')
+  .regex(/^[a-zA-Z0-9_]+$/, 'Логин может содержать только латинские буквы, цифры и _')
+
 export const loginSchema = z.object({
-  username: z.string().trim().min(3).max(16),
-  password: z.string().min(8).max(128).optional().default('offline123'),
+  username: usernameSchema,
+  password: z.string().min(8, 'Пароль должен содержать не менее 8 символов').max(128, 'Пароль слишком длинный'),
   remember: z.boolean().default(true)
 })
 
 export const registerSchema = z.object({
-  username: z.string().trim().min(3).max(16).regex(/^[a-zA-Z0-9_]+$/, 'Логин может содержать латинские буквы, цифры и _'),
-  password: z.string().min(8).max(128).regex(/[A-Z]/, 'Добавьте хотя бы одну заглавную букву').regex(/[0-9]/, 'Добавьте хотя бы одну цифру'),
-  confirmPassword: z.string(),
-  email: z.string().trim().email().max(254),
-  accepted: z.literal(true)
+  username: usernameSchema,
+  password: z
+    .string()
+    .min(8, 'Пароль должен содержать не менее 8 символов')
+    .max(128, 'Пароль слишком длинный')
+    .regex(/[A-Z]/, 'Добавьте хотя бы одну заглавную латинскую букву (A-Z)')
+    .regex(/[0-9]/, 'Добавьте хотя бы одну цифру'),
+  confirmPassword: z.string().min(1, 'Повторите пароль'),
+  email: z.string().trim().email('Введите корректную электронную почту').max(254),
+  accepted: z.literal(true, {
+    errorMap: () => ({ message: 'Примите правила сообщества для создания аккаунта' })
+  })
 }).refine(value => value.password === value.confirmPassword, {
   path: ['confirmPassword'],
   message: 'Пароли не совпадают'

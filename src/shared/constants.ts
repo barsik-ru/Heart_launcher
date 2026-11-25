@@ -30,6 +30,12 @@ export const IPC_CHANNELS = {
   settingsUpdate: 'service:settings:update',
   settingsReset: 'service:settings:reset',
 
+  donateGetCatalog: 'service:donate:getCatalog',
+  donateGetOrders: 'service:donate:getOrders',
+  donateCreateOrder: 'service:donate:createOrder',
+  donateMarkPaid: 'service:donate:markPaid',
+  donateGetOrderStatus: 'service:donate:getOrderStatus',
+
   launcherGetStatus: 'service:launcher:getStatus',
   launcherGetInstallationInfo: 'service:launcher:getInstallationInfo',
   launcherInstall: 'service:launcher:install',

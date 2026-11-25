@@ -1,7 +1,7 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowRight, Check, Eye, EyeOff, LockKeyhole, Mail, Plus, Trash2, UserCheck, UserRound, X } from 'lucide-react'
-import { registerSchema } from '@shared/schemas'
+import { ArrowRight, Check, Eye, EyeOff, LockKeyhole, Mail, Plus, Trash2, UserRound, X } from 'lucide-react'
+import { loginSchema, registerSchema } from '@shared/schemas'
 import type { UserProfile } from '@shared/types'
 import { services } from '../services/container'
 import { useAppStore } from '../stores/app-store'
@@ -28,29 +28,41 @@ export function AuthPage({ mode = 'login' }: { mode?: 'login' | 'register' }) {
   const [busy, setBusy] = useState(false)
   const [savedAccounts, setSavedAccounts] = useState<UserProfile[]>([])
   const [showNewForm, setShowNewForm] = useState(false)
-  const [serviceMode, setServiceMode] = useState<'demo' | 'backend' | 'offline' | null>(null)
+  const passwordInputRef = useRef<HTMLInputElement | null>(null)
   const setProfile = useAppStore(state => state.setProfile)
   const navigate = useNavigate()
   const register = mode === 'register'
 
   useEffect(() => {
-    void window.launcher?.system.getAppInfo().then(info => setServiceMode(info.serviceMode)).catch(() => setServiceMode('offline'))
-    const auth = window.launcher?.services.auth
-    if (auth?.getSavedAccounts) {
-      void auth.getSavedAccounts().then(accs => {
-        setSavedAccounts(accs)
-        if (accs.length === 0) setShowNewForm(true)
-      })
-    } else {
-      setShowNewForm(true)
+    setError('')
+    setPassword('')
+    setConfirmPassword('')
+  }, [mode])
+
+  useEffect(() => {
+    const loadAccounts = async () => {
+      try {
+        const accs = services.auth.getSavedAccounts
+          ? await services.auth.getSavedAccounts()
+          : await window.launcher?.services.auth?.getSavedAccounts?.()
+
+        if (accs && accs.length > 0) {
+          setSavedAccounts(accs)
+          setShowNewForm(false)
+        } else {
+          setShowNewForm(true)
+        }
+      } catch {
+        setShowNewForm(true)
+      }
     }
+    void loadAccounts()
   }, [])
 
-  // 4 условия для 4-х делений
   const hasMinLength = password.length >= 8
-  const hasUpperCase = /[A-ZА-ЯЁ]/.test(password)
+  const hasUpperCase = /[A-Z]/.test(password)
   const hasNumber = /[0-9]/.test(password)
-  const hasSpecialOrLong = /[^A-Za-zА-Яа-я0-9]/.test(password) || password.length >= 10
+  const hasSpecialOrLong = /[^A-Za-z0-9]/.test(password) || password.length >= 10
   const passwordsMatch = register ? password.length > 0 && password === confirmPassword : true
 
   let strengthScore = 0
@@ -64,28 +76,12 @@ export function AuthPage({ mode = 'login' }: { mode?: 'login' | 'register' }) {
   const strengthText =
     strengthScore <= 1 ? 'Слабый' : strengthScore === 2 ? 'Средний' : strengthScore === 3 ? 'Хороший' : 'Отличный'
 
-  const handleLoginWithName = async (nameToLogin: string) => {
-    const cleanUsername = nameToLogin.trim()
-    if (cleanUsername.length < 3 || cleanUsername.length > 16) {
-      setError(t.tr('Никнейм должен содержать от 3 до 16 символов', 'Username must be 3-16 chars'))
-      return
-    }
-
-    setBusy(true)
+  const selectSavedAccount = (account: UserProfile) => {
     setError('')
-    try {
-      const result = await services.auth.login({ username: cleanUsername, password: 'offline123', remember: true })
-      if (result.success) {
-        setProfile(result.profile)
-        navigate('/', { replace: true })
-      } else {
-        setError(localizeError(result.message, t.locale))
-      }
-    } catch (cause) {
-      setError(cause instanceof Error ? localizeError(cause.message, t.locale) : t.requestFailed)
-    } finally {
-      setBusy(false)
-    }
+    setUsername(account.username)
+    setPassword('')
+    setShowNewForm(true)
+    window.setTimeout(() => passwordInputRef.current?.focus(), 0)
   }
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
@@ -93,13 +89,25 @@ export function AuthPage({ mode = 'login' }: { mode?: 'login' | 'register' }) {
     setError('')
 
     const cleanUsername = username.trim()
-    if (cleanUsername.length < 3 || cleanUsername.length > 16) {
-      setError(t.tr('Никнейм должен быть от 3 до 16 символов', 'Username must be between 3 and 16 characters'))
-      return
-    }
 
     if (register) {
-      const validation = registerSchema.safeParse({ username: cleanUsername, password, confirmPassword, email, accepted })
+      const validation = registerSchema.safeParse({
+        username: cleanUsername,
+        password,
+        confirmPassword,
+        email: email.trim(),
+        accepted
+      })
+      if (!validation.success) {
+        setError(localizeError(validation.error.issues[0]?.message ?? t.checkInput, t.locale))
+        return
+      }
+    } else {
+      const validation = loginSchema.safeParse({
+        username: cleanUsername,
+        password,
+        remember
+      })
       if (!validation.success) {
         setError(localizeError(validation.error.issues[0]?.message ?? t.checkInput, t.locale))
         return
@@ -109,8 +117,17 @@ export function AuthPage({ mode = 'login' }: { mode?: 'login' | 'register' }) {
     setBusy(true)
     try {
       const result = register
-        ? await services.auth.register({ username: cleanUsername, password: password || 'offline123', email, accepted: true })
-        : await services.auth.login({ username: cleanUsername, password: password || 'offline123', remember })
+        ? await services.auth.register({
+            username: cleanUsername,
+            password,
+            email: email.trim(),
+            accepted: true
+          })
+        : await services.auth.login({
+            username: cleanUsername,
+            password,
+            remember
+          })
 
       if (result.success) {
         setProfile(result.profile)
@@ -127,12 +144,22 @@ export function AuthPage({ mode = 'login' }: { mode?: 'login' | 'register' }) {
 
   const removeAccount = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation()
-    const auth = window.launcher?.services.auth
-    if (auth?.removeSavedAccount) {
-      await auth.removeSavedAccount(id)
-      setSavedAccounts(prev => prev.filter(a => a.id !== id))
-    }
+    try {
+      if (services.auth.removeSavedAccount) {
+        await services.auth.removeSavedAccount(id)
+      } else if (window.launcher?.services.auth?.removeSavedAccount) {
+        await window.launcher.services.auth.removeSavedAccount(id)
+      }
+      setSavedAccounts(prev => {
+        const next = prev.filter(a => a.id !== id)
+        if (next.length === 0) setShowNewForm(true)
+        return next
+      })
+    } catch {}
   }
+
+  const matchedPreviewSkin =
+    savedAccounts.find(a => a.username.toLowerCase() === username.trim().toLowerCase())?.skinUrl ?? null
 
   return (
     <div className="auth-window" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -193,64 +220,89 @@ export function AuthPage({ mode = 'login' }: { mode?: 'login' | 'register' }) {
             <p className="auth-subtitle">
               {register
                 ? t.authCreateSubtitle
-                : t.tr('Выбери сохранённый никнейм или введи новый', 'Select a saved username or create a new one')}
+                : t.tr('Выбери сохранённый профиль или введи логин и пароль', 'Select a saved profile or enter your login and password')}
             </p>
-            {serviceMode === 'offline' && (
-              <div role="note" style={{ marginBottom: '14px', padding: '10px 12px', border: '1px solid rgba(210, 167, 78, .45)', borderRadius: '8px', background: 'rgba(210, 167, 78, .08)', color: 'var(--text)', fontSize: '12px', lineHeight: 1.5 }}>
-                <strong>Офлайн-режим:</strong> профиль и выбранный ник хранятся только на этом компьютере. Глобальная регистрация и проверка занятого ника на сервере пока не подключены; пароль из этой формы не проверяется сервером. Защиту игрового входа пока обеспечивает LimboAuth.
-              </div>
-            )}
+
+            {error && <div className="form-error" role="alert" style={{ marginBottom: '14px' }}>{error}</div>}
 
             {!register && savedAccounts.length > 0 && !showNewForm && (
-              <div className="saved-accounts-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '18px' }}>
+              <div className="saved-accounts-list" style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '18px' }}>
                 <span style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 600 }}>
                   {t.tr('СОХРАНЁННЫЕ ПРОФИЛИ', 'SAVED PROFILES')}
                 </span>
                 {savedAccounts.map(acc => (
                   <div
                     key={acc.id}
-                    onClick={() => void handleLoginWithName(acc.username)}
+                    onClick={() => selectSavedAccount(acc)}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
                       gap: '12px',
                       padding: '10px 14px',
-                      borderRadius: '8px',
+                      borderRadius: '0px',
                       background: 'var(--surface-raised)',
                       border: '1px solid var(--border)',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease'
                     }}
-                    onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--accent)')}
-                    onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border)')}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.borderColor = 'var(--accent)'
+                      e.currentTarget.style.background = 'var(--surface)'
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.borderColor = 'var(--border)'
+                      e.currentTarget.style.background = 'var(--surface-raised)'
+                    }}
                   >
-                    <div style={{ width: '32px', height: '32px', borderRadius: '4px', overflow: 'hidden', background: '#19221c', flexShrink: 0 }}>
-                      <SkinViewer skinUrl={acc.skinUrl} mode="head" width={32} height={32} />
+                    <div style={{ width: '36px', height: '36px', overflow: 'hidden', background: '#19221c', flexShrink: 0, border: '1px solid var(--border)' }}>
+                      <SkinViewer skinUrl={acc.skinUrl} mode="head" width={36} height={36} />
                     </div>
 
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <strong style={{ display: 'block', fontSize: '14px', color: 'var(--text)' }}>{acc.username}</strong>
-                      <small style={{ fontSize: '11px', color: 'var(--muted)' }}>Офлайн-профиль</small>
+                      <small style={{ fontSize: '11px', color: 'var(--muted)' }}>
+                        {t.tr('Нажмите, чтобы ввести пароль', 'Click to enter password')}
+                      </small>
                     </div>
+
                     <button
                       type="button"
                       onClick={e => void removeAccount(acc.id, e)}
-                      style={{ background: 'transparent', border: 0, color: 'var(--muted)', cursor: 'pointer', padding: '4px' }}
-                      title="Удалить"
+                      style={{ background: 'transparent', border: 0, color: 'var(--muted)', cursor: 'pointer', padding: '6px' }}
+                      title={t.tr('Удалить профиль', 'Remove profile')}
+                      onMouseEnter={e => (e.currentTarget.style.color = 'var(--danger)')}
+                      onMouseLeave={e => (e.currentTarget.style.color = 'var(--muted)')}
                     >
-                      <Trash2 size={15} />
+                      <Trash2 size={16} />
                     </button>
-                    <UserCheck size={16} style={{ color: 'var(--accent)' }} />
+
+                    <button
+                      type="button"
+                      className="primary-button"
+                      onClick={e => {
+                        e.stopPropagation()
+                        selectSavedAccount(acc)
+                      }}
+                      style={{ height: '32px', padding: '0 12px', fontSize: '11px', gap: '6px' }}
+                      disabled={busy}
+                    >
+                      {t.login} <ArrowRight size={13} />
+                    </button>
                   </div>
                 ))}
 
                 <button
                   type="button"
                   className="outline-button"
-                  onClick={() => setShowNewForm(true)}
-                  style={{ width: '100%', marginTop: '6px' }}
+                  onClick={() => {
+                    setError('')
+                    setUsername('')
+                    setPassword('')
+                    setShowNewForm(true)
+                  }}
+                  style={{ width: '100%', marginTop: '6px', height: '38px' }}
                 >
-                  <Plus size={15} /> {t.tr('Войти под другим ником', 'Add another username')}
+                  <Plus size={15} /> {t.tr('Войти под другим аккаунтом', 'Use another account')}
                 </button>
               </div>
             )}
@@ -261,21 +313,20 @@ export function AuthPage({ mode = 'login' }: { mode?: 'login' | 'register' }) {
                   <div style={{
                     width: '46px',
                     height: '46px',
-                    borderRadius: '8px',
                     border: '1px solid var(--border)',
                     background: 'var(--surface-raised)',
                     display: 'grid',
                     placeItems: 'center',
                     overflow: 'hidden'
                   }}>
-                    <SkinViewer skinUrl={null} mode="head" width={46} height={46} />
+                    <SkinViewer skinUrl={matchedPreviewSkin} mode="head" width={46} height={46} />
                   </div>
                   <div>
                     <strong style={{ fontSize: '13px', display: 'block' }}>
                       {username.trim() || t.tr('Игрок', 'Player')}
                     </strong>
                     <span style={{ fontSize: '11px', color: 'var(--muted)' }}>
-                      Офлайн-авторизация Heart
+                      {register ? t.tr('Регистрация Heart', 'Heart Registration') : t.tr('Авторизация Heart', 'Heart Sign In')}
                     </span>
                   </div>
                 </div>
@@ -291,7 +342,7 @@ export function AuthPage({ mode = 'login' }: { mode?: 'login' | 'register' }) {
                     minLength={3}
                     maxLength={16}
                     required
-                    placeholder={t.tr('Твой ник (например: Steve)', 'Your username (e.g. Steve)')}
+                    placeholder={t.tr('Твой ник (латиница, цифры, _)', 'Your username (A-Z, 0-9, _)')}
                     aria-invalid={Boolean(error)}
                   />
                 </div>
@@ -314,16 +365,18 @@ export function AuthPage({ mode = 'login' }: { mode?: 'login' | 'register' }) {
                   </>
                 )}
 
-                <label htmlFor="auth-password">{register ? t.password : t.tr('Пароль (необязательно)', 'Password (optional)')}</label>
+                <label htmlFor="auth-password">{t.password}</label>
                 <div className="auth-input-wrap">
                   <LockKeyhole size={16} />
                   <input
+                    ref={passwordInputRef}
                     id="auth-password"
                     type={showPassword ? 'text' : 'password'}
                     autoComplete={register ? 'new-password' : 'current-password'}
                     value={password}
                     onChange={event => setPassword(event.target.value)}
-                    placeholder={register ? t.passwordPlaceholder : t.tr('Оставь пустым для офлайн-входа', 'Leave empty for offline')}
+                    required
+                    placeholder={register ? t.passwordPlaceholder : t.tr('Введи свой пароль', 'Enter your password')}
                   />
                   <button
                     type="button"
@@ -361,7 +414,7 @@ export function AuthPage({ mode = 'login' }: { mode?: 'login' | 'register' }) {
                         {hasMinLength ? <Check size={12} /> : <X size={12} />} 8+ символов
                       </span>
                       <span style={{ display: 'flex', alignItems: 'center', gap: '5px', color: hasUpperCase ? '#9aba7d' : 'var(--muted)' }}>
-                        {hasUpperCase ? <Check size={12} /> : <X size={12} />} Заглавная буква
+                        {hasUpperCase ? <Check size={12} /> : <X size={12} />} Заглавная буква (A-Z)
                       </span>
                       <span style={{ display: 'flex', alignItems: 'center', gap: '5px', color: hasNumber ? '#9aba7d' : 'var(--muted)' }}>
                         {hasNumber ? <Check size={12} /> : <X size={12} />} Хотя бы 1 цифра
@@ -413,14 +466,16 @@ export function AuthPage({ mode = 'login' }: { mode?: 'login' | 'register' }) {
                   <button
                     type="button"
                     className="text-button"
-                    onClick={() => setShowNewForm(false)}
+                    onClick={() => {
+                      setError('')
+                      setPassword('')
+                      setShowNewForm(false)
+                    }}
                     style={{ alignSelf: 'flex-start', fontSize: '12px' }}
                   >
                     ← {t.tr('Назад к сохранённым профилям', 'Back to saved profiles')}
                   </button>
                 )}
-
-                {error && <div className="form-error" role="alert">{error}</div>}
 
                 <button className="primary-button auth-submit" type="submit" disabled={busy}>
                   {busy ? t.checkingData : register ? t.register : t.login}

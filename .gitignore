@@ -17,3 +17,9 @@ release/
 *.p12
 *.pem
 *.key
+node_modules/
+out/
+release/
+src-tauri/target/
+*.exe
+*.msi

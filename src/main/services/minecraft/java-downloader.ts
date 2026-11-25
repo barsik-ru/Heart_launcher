@@ -107,9 +107,10 @@ export async function ensureJava21(
 
 function findJavaInDir(dir: string): string | null {
   if (!existsSync(dir)) return null
-  const binaryName = process.platform === 'win32' ? 'javaw.exe' : 'java'
-  const fallback = process.platform === 'win32' ? 'java.exe' : 'java'
+  const primaryName = process.platform === 'win32' ? 'javaw.exe' : 'java'
+  const fallbackName = process.platform === 'win32' ? 'java.exe' : 'java'
 
+  let fallbackMatch: string | null = null
   const queue = [dir]
   while (queue.length > 0) {
     const current = queue.shift()!
@@ -119,11 +120,18 @@ function findJavaInDir(dir: string): string | null {
         const full = join(current, entry.name)
         if (entry.isDirectory()) {
           queue.push(full)
-        } else if (entry.isFile() && (entry.name === binaryName || entry.name === fallback)) {
-          return full
+        } else if (entry.isFile()) {
+          const lower = entry.name.toLowerCase()
+          if (lower === primaryName) {
+            return full
+          }
+          if (!fallbackMatch && lower === fallbackName) {
+            const javawCandidate = join(current, 'javaw.exe')
+            fallbackMatch = process.platform === 'win32' && existsSync(javawCandidate) ? javawCandidate : full
+          }
         }
       }
     } catch {}
   }
-  return null
+  return fallbackMatch
 }

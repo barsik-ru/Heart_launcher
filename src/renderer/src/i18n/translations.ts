@@ -1,6 +1,6 @@
 export const translations = {
   ru: {
-    home: 'Главная', news: 'Новости', modpack: 'Модпак', profile: 'Профиль', settings: 'Настройки',
+    home: 'Главная', news: 'Новости', modpack: 'Модпак', donate: 'Донат', profile: 'Профиль', settings: 'Настройки',
     play: 'Играть', install: 'Установить', update: 'Обновить', verify: 'Проверить файлы',
     launching: 'Запуск…', ready: 'Клиент готов к запуску', server: 'Сервер', online: 'В сети',
     offline: 'Не в сети', players: 'игроков онлайн', demo: 'Демо-режим', logout: 'Выйти',
@@ -97,7 +97,7 @@ export const translations = {
     unknownError: 'Неизвестная ошибка'
   },
   en: {
-    home: 'Home', news: 'News', modpack: 'Modpack', profile: 'Profile', settings: 'Settings',
+    home: 'Home', news: 'News', modpack: 'Modpack', donate: 'Store', profile: 'Profile', settings: 'Settings',
     play: 'Play', install: 'Install', update: 'Update', verify: 'Verify files',
     launching: 'Launching…', ready: 'Client ready to launch', server: 'Server', online: 'Online',
     offline: 'Offline', players: 'players online', demo: 'Demo mode', logout: 'Log out',

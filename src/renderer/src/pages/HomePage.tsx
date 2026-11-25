@@ -111,7 +111,12 @@ export function HomePage() {
       setInstallation(nextInstallation)
       setLauncher(nextStatus)
     } catch (cause) {
-      setOperationError(cause instanceof Error ? localizeError(cause.message, t.locale) : t.operationFailed)
+      const msg = cause instanceof Error
+        ? cause.message
+        : typeof cause === 'string' && cause.trim()
+          ? cause
+          : t.operationFailed
+      setOperationError(localizeError(msg, t.locale))
     } finally {
       setBusy(false)
     }
@@ -163,7 +168,7 @@ export function HomePage() {
         </div>
       </section>
 
-      {operationRunning && progress && (
+      {operationRunning && !isLaunching && !busy && progress && (
         <section className="home-operation" aria-live="polite">
           <div>
             <strong>{stageLabel} · {progress.progress}%</strong>
@@ -212,7 +217,7 @@ export function HomePage() {
                 <Link to={`/news/${item.id}`} className="news-card-equal" key={item.id}>
                   <div className="news-thumb-equal" style={{ backgroundImage: `url("${resolveNewsImage(item.image, idx)}")` }}/>
                   <div className="news-card-content-equal">
-                    <div className="news-meta"><span>{categoryLabel(item.category)}</span><time>{new Date(item.date).toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' })}</time></div>
+                    <div className="news-meta"><span>{categoryLabel(item.category)}</span><time>{(() => { const d = new Date(item.date); return Number.isNaN(d.getTime()) ? item.date : d.toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' }); })()}</time></div>
                     <h3>{item.title}</h3>
                     <p>{item.excerpt}</p>
                     <span className="news-read">{t.openPost}<ChevronRight size={14}/></span>

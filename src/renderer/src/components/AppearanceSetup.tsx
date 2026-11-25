@@ -53,18 +53,27 @@ export function AppearanceSetup({ settings, onComplete }: Props) {
   }
 
   return (
-    <div className="appearance-setup-backdrop" role="presentation">
+    <div
+      className="appearance-setup-backdrop"
+      role="presentation"
+      style={{
+        WebkitAppRegion: 'no-drag',
+        backdropFilter: 'none',
+        WebkitBackdropFilter: 'none'
+      } as React.CSSProperties}
+    >
       <motion.section
         className="appearance-setup"
         role="dialog"
         aria-modal="true"
         style={{
           border: `2px solid ${currentThemeObj.color}`,
-          borderRadius: '0px'
-        }}
-        initial={animations ? { opacity: 0, y: 8 } : false}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.18 }}
+          borderRadius: '0px',
+          WebkitAppRegion: 'no-drag'
+        } as React.CSSProperties}
+        initial={animations ? { opacity: 0, scale: 0.98 } : false}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.15, ease: 'easeOut' }}
       >
         <div className="appearance-setup-topline">
           <span
@@ -89,7 +98,6 @@ export function AppearanceSetup({ settings, onComplete }: Props) {
           </p>
         </header>
 
-        {/* Сетка тем с цветными квадратными блоками */}
         <div className="appearance-theme-grid">
           {THEMES.map(item => {
             const isSelected = theme === item.id
@@ -101,7 +109,8 @@ export function AppearanceSetup({ settings, onComplete }: Props) {
                 style={{
                   borderColor: isSelected ? item.color : 'var(--border)',
                   background: isSelected ? 'var(--surface-raised)' : 'var(--surface)',
-                  borderRadius: '0px'
+                  borderRadius: '0px',
+                  cursor: 'pointer'
                 }}
                 onClick={() => setTheme(item.id)}
               >
@@ -190,7 +199,8 @@ export function AppearanceSetup({ settings, onComplete }: Props) {
             color: '#111',
             fontWeight: 800,
             fontSize: '13px',
-            borderRadius: '0px'
+            borderRadius: '0px',
+            cursor: 'pointer'
           }}
           disabled={busy}
           onClick={() => void complete()}

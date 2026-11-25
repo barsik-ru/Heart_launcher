@@ -34,7 +34,12 @@ export function InstallationPage() {
       if (kind === 'verify') await services.launcher.verifyFiles()
       if (kind === 'launch') await services.launcher.launch()
     } catch (cause) {
-      setError(cause instanceof Error ? localizeError(cause.message, t.locale) : t.operationFailed)
+      const msg = cause instanceof Error
+        ? cause.message
+        : typeof cause === 'string' && cause.trim()
+          ? cause
+          : t.operationFailed
+      setError(localizeError(msg, t.locale))
     }
   }
 

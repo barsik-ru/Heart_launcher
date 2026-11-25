@@ -14,11 +14,12 @@ const nav = [
   { to: '/', key: 'home' as const, glyph: 'home' as const },
   { to: '/news', key: 'news' as const, glyph: 'news' as const },
   { to: '/modpack', key: 'modpack' as const, glyph: 'modpack' as const },
+  { to: '/donate', key: 'donate' as const, glyph: 'donate' as const },
   { to: '/profile', key: 'profile' as const, glyph: 'profile' as const },
   { to: '/settings', key: 'settings' as const, glyph: 'settings' as const }
 ]
 
-const SERVER_REFRESH_INTERVAL = 2500
+const SERVER_REFRESH_INTERVAL = 10000
 const SERVER_ADDRESS = `${brand.server.host}:${brand.server.port}`
 
 export function Sidebar() {
@@ -29,6 +30,7 @@ export function Sidebar() {
   const setSettingsDirty = useAppStore(state => state.setSettingsDirty)
   const setSettings = useAppStore(state => state.setSettings)
   const [server, setServer] = useState<ServerStatus | null>(null)
+  const [launcherVersion, setLauncherVersion] = useState<string>(brand.version)
   const [logoutBusy, setLogoutBusy] = useState(false)
   const [logoutError, setLogoutError] = useState('')
   const [addressCopied, setAddressCopied] = useState(false)
@@ -42,6 +44,18 @@ export function Sidebar() {
       if (copyFeedbackTimer.current !== null) {
         window.clearTimeout(copyFeedbackTimer.current)
       }
+    }
+  }, [])
+
+  useEffect(() => {
+    let active = true
+    void window.launcher?.system.getAppInfo()
+      .then(info => {
+        if (active && info?.version) setLauncherVersion(info.version)
+      })
+      .catch(() => undefined)
+    return () => {
+      active = false
     }
   }, [])
 
@@ -159,7 +173,6 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* Карточка сервера */}
       <section className="server-mini" aria-label={t.tr('Статус сети серверов', 'Server status')}>
         <div className="server-mini-top">
           <span>{t.serverWorld}</span>
@@ -168,7 +181,6 @@ export function Sidebar() {
           </span>
         </div>
 
-        {/* Компактный ряд игроков: 0 / 35 онлайн */}
         <div className="server-population">
           <div className="server-population-numbers">
             <strong className="server-mini-number">
@@ -218,7 +230,7 @@ export function Sidebar() {
       <div className="sidebar-bottom">
         <div className="sidebar-version">
           <span>{t.launcherVersion}</span>
-          <code>{brand.version}</code>
+          <code>{launcherVersion}</code>
         </div>
 
         {profile && (
@@ -240,7 +252,7 @@ export function Sidebar() {
                     padding: 0,
                     width: '29px',
                     height: '29px',
-                    borderRadius: '4px',
+                    borderRadius: '0px',
                     border: '1px solid var(--border)',
                     background: 'var(--surface-raised)',
                     display: 'grid',

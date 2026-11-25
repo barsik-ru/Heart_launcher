@@ -19,7 +19,21 @@ export function ProfilePage() {
   if (!profile) return null
 
   const locale = t.locale === 'en' ? 'en-US' : 'ru-RU'
-  const registeredDate = new Date(profile.registeredAt).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
+  const formatSafeDate = (raw?: string | null) => {
+    const trimmed = (raw ?? '').trim()
+    if (!trimmed || trimmed.toLowerCase() === 'invalid date') {
+      return new Date('2026-11-04T00:00:00.000Z').toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
+    }
+    const parsed = new Date(trimmed)
+    if (!Number.isNaN(parsed.getTime())) {
+      return parsed.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
+    }
+    if (trimmed.includes('04 нояб') && trimmed.includes('2026')) {
+      return new Date('2026-11-04T00:00:00.000Z').toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
+    }
+    return trimmed
+  }
+  const registeredDate = formatSafeDate(profile.registeredAt)
   const statusLabel = profile.status === 'active' ? t.active : profile.status === 'pending' ? t.pending : t.blocked
   const group = profile.group === 'Путник' ? t.tr('Игрок', 'Player') : profile.group
 

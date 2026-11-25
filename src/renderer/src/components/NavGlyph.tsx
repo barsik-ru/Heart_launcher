@@ -1,6 +1,6 @@
 import type { SVGProps } from 'react'
 
-type NavGlyphName = 'home' | 'news' | 'modpack' | 'profile' | 'settings'
+type NavGlyphName = 'home' | 'news' | 'modpack' | 'donate' | 'profile' | 'settings'
 
 type NavGlyphProps = SVGProps<SVGSVGElement> & {
   name: NavGlyphName
@@ -42,6 +42,14 @@ export function NavGlyph({ name, ...props }: NavGlyphProps) {
           <path d="m3 6 6.5-3.1L17 6l-7.5 3.5L3 6Z" />
           <path d="m3 9.3 6.5 3.1 7.5-3.1M3 12.6l6.5 3.1 7.5-3.1" />
           <path d="M9.5 9.5v3M9.5 12.7v3" opacity=".55" />
+        </svg>
+      )
+    case 'donate':
+      return (
+        <svg {...common}>
+          <path d="M6.1 4.2h7.8l3.2 4.1-7.1 8-7.1-8 3.2-4.1Z" />
+          <path d="M2.9 8.3h14.2" />
+          <path d="M7.3 4.2 6.4 8.3 10 16.3l3.6-8-.9-4.1" opacity=".55" />
         </svg>
       )
     case 'profile':

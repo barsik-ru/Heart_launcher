@@ -261,3 +261,67 @@ p { text-wrap: pretty; }
   font-size: 13px !important;
   letter-spacing: 0.02em;
 }
+/* Исправление полоски и мигания рамки при смене вкладок */
+.hero-card {
+  position: relative;
+  overflow: hidden !important;
+  contain: paint !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 0px !important;
+  background: var(--surface) !important;
+  transform: translateZ(0); /* Аппаратная фиксация границ */
+}
+
+/* Отключаем непрерывный zoom картинки, чтобы не грузить GPU и не ломать границы */
+.hero-image {
+  position: absolute;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-size: cover !important;
+  background-position: center 52% !important;
+  transform: none !important;
+  animation: none !important; /* Убираем постоянный дрифт */
+  filter: saturate(1.02) brightness(.93) !important;
+}
+
+/* Точные границы затенения без вылезания наружу */
+.hero-shade {
+  position: absolute;
+  inset: 0 !important;
+  pointer-events: none;
+}
+
+/* Отключаем дублирующую анимацию прибытия карточки, пока работает роутер */
+.app-root.motion-on .hero-card {
+  animation: none !important;
+}
+/* ==============================================================
+   ФИКС ФРИЗОВ МЫШИ В ОКНЕ НАСТРОЙКИ ТЕМЫ (FIRST RUN)
+   ============================================================== */
+.appearance-setup-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 10000 !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 26px !important;
+  background: rgba(10, 16, 12, 0.94) !important;
+  /* Полностью отключаем backdrop-filter: он забивает GPU поток браузера при движении мыши */
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-app-region: no-drag !important;
+  user-select: none;
+  pointer-events: auto !important;
+}
+
+.appearance-setup {
+  position: relative !important;
+  -webkit-app-region: no-drag !important;
+  pointer-events: auto !important;
+  will-change: opacity, transform;
+}
+
+.appearance-setup * {
+  -webkit-app-region: no-drag !important;
+}

@@ -11,6 +11,7 @@ export interface LauncherBridge {
     getMemory(): Promise<SystemMemoryInfo>
     getAppInfo(): Promise<AppInfo>
     openGameFolder(): Promise<void>
+    openDiscord?: () => Promise<void>
     getScreenResolution(): Promise<{ width: number; height: number }>
   }
   dialog: {

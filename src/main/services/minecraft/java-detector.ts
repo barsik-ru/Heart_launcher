@@ -10,15 +10,22 @@ export interface JavaInfo {
 
 export function verifyJavaBinary(binaryPath: string): JavaInfo | null {
   try {
-    if (!existsSync(binaryPath)) return null
-    const result = spawnSync(binaryPath, ['-version'], { encoding: 'utf8', timeout: 4000 })
+    let resolvedPath = binaryPath
+    if (process.platform === 'win32' && resolvedPath.toLowerCase().endsWith('\\java.exe')) {
+      const javawPath = resolvedPath.slice(0, -8) + 'javaw.exe'
+      if (existsSync(javawPath)) {
+        resolvedPath = javawPath
+      }
+    }
+    if (!existsSync(resolvedPath)) return null
+    const result = spawnSync(resolvedPath, ['-version'], { encoding: 'utf8', timeout: 4000, windowsHide: true })
     const output = (result.stderr || '') + (result.stdout || '')
     const match = output.match(/version\s+"(\d+)(?:\.(\d+))?/)
     if (!match) return null
 
     const majorVersion = parseInt(match[1], 10)
     return {
-      path: binaryPath,
+      path: resolvedPath,
       version: match[0].replace('version ', '').replace(/"/g, ''),
       majorVersion
     }

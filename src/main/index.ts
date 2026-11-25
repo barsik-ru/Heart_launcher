@@ -1,3 +1,5 @@
+
+
 import { app, BrowserWindow } from 'electron'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -135,7 +137,8 @@ if (!hasSingleInstanceLock) {
     } else if (apiBaseUrl) {
       try {
         services = createBackendServices(apiBaseUrl, settingsService, sessionFilePath)
-        services.server = minecraftStatusService
+        // ОПТИМИЗАЦИЯ: Убран перезапис services.server = minecraftStatusService (TCP Ping). 
+        // Теперь backendServices.ts будет сам запрашивать /v1/server/status по легкому HTTP!
         services.updater = updaterService
         serviceMode = 'backend'
       } catch (cause) {
