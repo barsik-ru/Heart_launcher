@@ -94,6 +94,6 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.tag || github.ref_name }}
           name: Heart Launcher ${{ github.event.inputs.tag || github.ref_name }}
-          files: release-files/*
+          files: release-files/**/*
           prerelease: false
           make_latest: true
