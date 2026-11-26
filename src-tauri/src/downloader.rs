@@ -15,6 +15,7 @@ pub struct DownloadTask {
     pub dest_path: PathBuf,
     pub size: Option<u64>,
     pub sha1: Option<String>,
+    pub sha256: Option<String>,
     pub label: String,
 }
 
@@ -24,7 +25,7 @@ pub fn get_http_client() -> reqwest::Client {
     SHARED_HTTP_CLIENT
         .get_or_init(|| {
             reqwest::Client::builder()
-                .user_agent("HeartLauncher/0.4.0 (Windows NT 10.0; Win64; x64)")
+                .user_agent("HeartLauncher/0.5.0 (Windows NT 10.0; Win64; x64)")
                 .danger_accept_invalid_certs(true)
                 .tcp_nodelay(true)
                 .tcp_keepalive(Duration::from_secs(30))
@@ -111,14 +112,30 @@ pub fn verify_file_sha256(path: &Path, expected_sha256: &str) -> bool {
     if !path.exists() {
         return false;
     }
-    if let Ok(bytes) = fs::read(path) {
-        let hash = hex::encode(Sha256::digest(&bytes));
-        return hash.eq_ignore_ascii_case(expected_sha256);
+    let mut file = match File::open(path) {
+        Ok(f) => f,
+        Err(_) => return false,
+    };
+    let mut hasher = Sha256::new();
+    let mut buffer = [0u8; 32768];
+    loop {
+        let count = match file.read(&mut buffer) {
+            Ok(0) => break,
+            Ok(n) => n,
+            Err(_) => return false,
+        };
+        hasher.update(&buffer[..count]);
     }
-    false
+    let hash = hex::encode(hasher.finalize());
+    hash.eq_ignore_ascii_case(expected_sha256)
 }
 
-pub fn is_valid_existing_file(path: &Path, expected_size: Option<u64>, sha1: Option<&str>) -> bool {
+pub fn is_valid_existing_file(
+    path: &Path,
+    expected_size: Option<u64>,
+    sha1: Option<&str>,
+    sha256: Option<&str>,
+) -> bool {
     let meta = match fs::metadata(path) {
         Ok(m) => m,
         Err(_) => return false,
@@ -126,15 +143,29 @@ pub fn is_valid_existing_file(path: &Path, expected_size: Option<u64>, sha1: Opt
     if meta.len() == 0 {
         return false;
     }
+
+    let has_size = expected_size.is_some_and(|sz| sz > 0);
     if let Some(sz) = expected_size {
-        if sz > 0 {
-            return meta.len() == sz;
+        if sz > 0 && meta.len() != sz {
+            return false;
         }
     }
-    if let Some(hash) = sha1 {
-        return verify_file_sha1(path, hash);
+
+    let clean_sha256 = sha256.map(str::trim).filter(|s| !s.is_empty());
+    if let Some(hash256) = clean_sha256 {
+        if !verify_file_sha256(path, hash256) {
+            return false;
+        }
     }
-    true
+
+    let clean_sha1 = sha1.map(str::trim).filter(|s| !s.is_empty());
+    if let Some(hash1) = clean_sha1 {
+        if !verify_file_sha1(path, hash1) {
+            return false;
+        }
+    }
+
+    has_size || clean_sha1.is_some() || clean_sha256.is_some()
 }
 
 async fn download_single_file_once<F>(
@@ -143,6 +174,7 @@ async fn download_single_file_once<F>(
     dest: &Path,
     expected_size: Option<u64>,
     expected_sha1: Option<&str>,
+    expected_sha256: Option<&str>,
     on_chunk: &F,
 ) -> Result<(), String>
 where
@@ -157,6 +189,7 @@ where
 
     let res = client
         .get(url)
+        .header("Cache-Control", "no-cache")
         .send()
         .await
         .map_err(|e| format!("{}: {}", url, format_error_chain(&e)))?;
@@ -194,16 +227,23 @@ where
         if sz > 0 && downloaded != sz {
             let _ = fs::remove_file(&temp_path);
             return Err(format!(
-                "Неполный файл {}: получено {} байт из {}",
+                "еполный файл {}: получено {} байт из {}",
                 url, downloaded, sz
             ));
         }
     }
 
-    if let Some(hash) = expected_sha1 {
+    if let Some(hash256) = expected_sha256.map(str::trim).filter(|s| !s.is_empty()) {
+        if !verify_file_sha256(&temp_path, hash256) {
+            let _ = fs::remove_file(&temp_path);
+            return Err(format!("онтрольная сумма SHA-256 не совпала для {}", url));
+        }
+    }
+
+    if let Some(hash) = expected_sha1.map(str::trim).filter(|s| !s.is_empty()) {
         if !verify_file_sha1(&temp_path, hash) {
             let _ = fs::remove_file(&temp_path);
-            return Err(format!("Контрольная сумма SHA-1 не совпала для {}", url));
+            return Err(format!("онтрольная сумма SHA-1 не совпала для {}", url));
         }
     }
 
@@ -223,7 +263,7 @@ where
     let mut last_err = String::new();
 
     for attempt in 1..=3u64 {
-        match download_single_file_once(&client, url, dest, None, None, &on_chunk).await {
+        match download_single_file_once(&client, url, dest, None, None, None, &on_chunk).await {
             Ok(()) => return Ok(()),
             Err(e) => {
                 last_err = e;
@@ -249,7 +289,14 @@ pub async fn download_pool(
     let total_tasks = tasks.len();
     let pending_tasks: Vec<DownloadTask> = tasks
         .into_iter()
-        .filter(|t| !is_valid_existing_file(&t.dest_path, t.size, t.sha1.as_deref()))
+        .filter(|t| {
+            !is_valid_existing_file(
+                &t.dest_path,
+                t.size,
+                t.sha1.as_deref(),
+                t.sha256.as_deref(),
+            )
+        })
         .collect();
 
     let pending_count = pending_tasks.len();
@@ -277,6 +324,7 @@ pub async fn download_pool(
                         &task.dest_path,
                         task.size,
                         task.sha1.as_deref(),
+                        task.sha256.as_deref(),
                         &|_, _| {},
                     )
                     .await
@@ -288,7 +336,7 @@ pub async fn download_pool(
                             return Ok(());
                         }
                         Err(e) => {
-                            last_err = format!("{} — {}", task.label, e);
+                            last_err = format!("{} - {}", task.label, e);
                             if attempt < 3 {
                                 tokio::time::sleep(Duration::from_millis(500 * attempt)).await;
                             }
@@ -305,7 +353,7 @@ pub async fn download_pool(
     let errors: Vec<String> = results.into_iter().filter_map(Result::err).collect();
     if let Some(first_err) = errors.first() {
         return Err(format!(
-            "Не удалось загрузить {} файл(ов): {}",
+            "е удалось загрузить {} файл(ов): {}",
             errors.len(),
             first_err
         ));

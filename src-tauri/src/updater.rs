@@ -62,6 +62,28 @@ fn state_lock() -> &'static Mutex<UpdaterState> {
     })
 }
 
+pub fn cleanup_old_update_artifacts() {
+    if let Ok(current_exe) = std::env::current_exe() {
+        if let Some(exe_dir) = current_exe.parent() {
+            if let Ok(entries) = fs::read_dir(exe_dir) {
+                for entry in entries.flatten() {
+                    let path = entry.path();
+                    if !path.is_file() || path == current_exe {
+                        continue;
+                    }
+                    let name = entry.file_name().to_string_lossy().to_lowercase();
+                    if name.ends_with(".update.exe")
+                        || name.ends_with(".exe.old")
+                        || name.ends_with(".part")
+                    {
+                        let _ = fs::remove_file(path);
+                    }
+                }
+            }
+        }
+    }
+}
+
 fn emit_state(app: &AppHandle, status: &AppUpdateStatus) {
     let _ = app.emit("event:updater:state", status);
 }
@@ -101,7 +123,6 @@ fn parse_semver(raw: &str) -> Option<(u64, u64, u64)> {
 fn pick_release_asset(assets: &[GitHubAsset]) -> Option<ReleaseAsset> {
     #[cfg(windows)]
     {
-        // 1. Сначала ищем прямой переносимый .exe (не setup/uninstaller)
         if let Some(a) = assets.iter().find(|a| {
             let n = a.name.to_lowercase();
             n.ends_with(".exe") && !n.contains("setup") && !n.contains("installer") && !n.contains("unins")
@@ -114,7 +135,6 @@ fn pick_release_asset(assets: &[GitHubAsset]) -> Option<ReleaseAsset> {
             });
         }
 
-        // 2. Затем .zip архив для Windows
         if let Some(a) = assets.iter().find(|a| {
             let n = a.name.to_lowercase();
             n.ends_with(".zip") && !n.contains("blockmap")
@@ -127,7 +147,6 @@ fn pick_release_asset(assets: &[GitHubAsset]) -> Option<ReleaseAsset> {
             });
         }
 
-        // 3. Затем NSIS-установщик (*setup*.exe)
         if let Some(a) = assets.iter().find(|a| {
             let n = a.name.to_lowercase();
             n.ends_with(".exe") && !n.contains("unins")
@@ -245,7 +264,7 @@ pub async fn updater_check(app: AppHandle) -> Result<AppUpdateStatus, String> {
             let status = set_and_emit_status(&app, |s| {
                 s.state = "error".into();
                 s.error = Some(format!(
-                    "Не удалось проверить обновления: {}",
+                    "е удалось проверить обновления: {}",
                     format_error_chain(&e)
                 ));
             });
@@ -275,7 +294,7 @@ pub async fn updater_check(app: AppHandle) -> Result<AppUpdateStatus, String> {
         Err(e) => {
             let status = set_and_emit_status(&app, |s| {
                 s.state = "error".into();
-                s.error = Some(format!("Ошибка чтения метаданных релиза: {}", e));
+                s.error = Some(format!("шибка чтения метаданных релиза: {}", e));
             });
             return Ok(status);
         }
@@ -307,7 +326,7 @@ pub async fn updater_check(app: AppHandle) -> Result<AppUpdateStatus, String> {
         let status = set_and_emit_status(&app, |s| {
             s.state = "not-available".into();
             s.available_version = None;
-            s.error = Some("В релизе нет файла обновления для вашей ОС.".into());
+            s.error = Some(" релизе нет файла обновления для вашей С.".into());
         });
         return Ok(status);
     };
@@ -338,22 +357,15 @@ pub async fn updater_download(app: AppHandle) -> Result<(), String> {
         guard
             .asset
             .clone()
-            .ok_or_else(|| "Нет доступного обновления для загрузки.".to_string())?
+            .ok_or_else(|| "ет доступного обновления для загрузки.".to_string())?
     };
 
     let current_exe = std::env::current_exe()
-        .map_err(|e| format!("Не удалось определить путь к текущему лаунчеру: {}", e))?;
-    let exe_dir = current_exe
-        .parent()
-        .ok_or_else(|| "Не удалось определить папку текущего лаунчера.".to_string())?;
+        .map_err(|e| format!("е удалось определить путь к текущему лаунчеру: {}", e))?;
 
-    let target_dir = if is_dir_writable(exe_dir) {
-        exe_dir.to_path_buf()
-    } else {
-        let fallback = std::env::temp_dir().join("heart-launcher-update");
-        let _ = fs::create_dir_all(&fallback);
-        fallback
-    };
+    let target_dir = std::env::temp_dir().join("heart-launcher-update");
+    fs::create_dir_all(&target_dir)
+        .map_err(|e| format!("е удалось создать временную папку обновлений: {}", e))?;
 
     let exe_stem = current_exe
         .file_stem()
@@ -384,7 +396,7 @@ pub async fn updater_download(app: AppHandle) -> Result<(), String> {
     {
         Ok(r) if r.status().is_success() => r,
         Ok(r) => {
-            let msg = format!("Ошибка загрузки обновления: HTTP {}", r.status());
+            let msg = format!("шибка загрузки обновления: HTTP {}", r.status());
             set_and_emit_status(&app, |s| {
                 s.state = "error".into();
                 s.error = Some(msg.clone());
@@ -392,7 +404,7 @@ pub async fn updater_download(app: AppHandle) -> Result<(), String> {
             return Err(msg);
         }
         Err(e) => {
-            let msg = format!("Ошибка сети при загрузке обновления: {}", format_error_chain(&e));
+            let msg = format!("шибка сети при загрузке обновления: {}", format_error_chain(&e));
             set_and_emit_status(&app, |s| {
                 s.state = "error".into();
                 s.error = Some(msg.clone());
@@ -403,7 +415,7 @@ pub async fn updater_download(app: AppHandle) -> Result<(), String> {
 
     let total_bytes = res.content_length().unwrap_or(asset.size);
     let mut file = File::create(&part_path).map_err(|e| {
-        let msg = format!("Не удалось создать файл обновления: {}", e);
+        let msg = format!("е удалось создать файл обновления: {}", e);
         set_and_emit_status(&app, |s| {
             s.state = "error".into();
             s.error = Some(msg.clone());
@@ -434,7 +446,7 @@ pub async fn updater_download(app: AppHandle) -> Result<(), String> {
         if let Err(e) = file.write_all(&chunk) {
             drop(file);
             let _ = fs::remove_file(&part_path);
-            let msg = format!("Ошибка записи файла обновления: {}", e);
+            let msg = format!("шибка записи файла обновления: {}", e);
             set_and_emit_status(&app, |s| {
                 s.state = "error".into();
                 s.error = Some(msg.clone());
@@ -479,7 +491,7 @@ pub async fn updater_download(app: AppHandle) -> Result<(), String> {
     if asset.size > 0 && transferred_bytes != asset.size {
         let _ = fs::remove_file(&part_path);
         let msg = format!(
-            "Размер файла обновления не совпал ({} из {} байт).",
+            "азмер файла обновления не совпал ({} из {} байт).",
             transferred_bytes, asset.size
         );
         set_and_emit_status(&app, |s| {
@@ -492,7 +504,7 @@ pub async fn updater_download(app: AppHandle) -> Result<(), String> {
     let _ = fs::remove_file(&dest_path);
     if let Err(e) = fs::rename(&part_path, &dest_path) {
         let _ = fs::remove_file(&part_path);
-        let msg = format!("Не удалось сохранить файл обновления: {}", e);
+        let msg = format!("е удалось сохранить файл обновления: {}", e);
         set_and_emit_status(&app, |s| {
             s.state = "error".into();
             s.error = Some(msg.clone());
@@ -530,19 +542,19 @@ pub async fn updater_install(app: AppHandle) -> Result<(), String> {
         (guard.asset.clone(), guard.downloaded_path.clone())
     };
 
-    let asset = asset.ok_or_else(|| "Метаданные обновления не найдены.".to_string())?;
+    let asset = asset.ok_or_else(|| "етаданные обновления не найдены.".to_string())?;
     let downloaded_path =
-        downloaded_path.ok_or_else(|| "Файл обновления ещё не скачан.".to_string())?;
+        downloaded_path.ok_or_else(|| "айл обновления ещё не скачан.".to_string())?;
 
     if !downloaded_path.exists() {
-        return Err("Файл обновления не найден на диске.".into());
+        return Err("айл обновления не найден на диске.".into());
     }
 
     let current_exe = std::env::current_exe()
-        .map_err(|e| format!("Не удалось определить путь к текущему лаунчеру: {}", e))?;
+        .map_err(|e| format!("е удалось определить путь к текущему лаунчеру: {}", e))?;
     let exe_dir = current_exe
         .parent()
-        .ok_or_else(|| "Не удалось определить папку текущего лаунчера.".to_string())?;
+        .ok_or_else(|| "е удалось определить папку текущего лаунчера.".to_string())?;
 
     set_and_emit_status(&app, |s| {
         s.state = "installing".into();
@@ -552,8 +564,10 @@ pub async fn updater_install(app: AppHandle) -> Result<(), String> {
     #[cfg(windows)]
     {
         let pid = std::process::id();
+        let exe_dir_clean = exe_dir.to_string_lossy().trim_end_matches('\\').to_string();
         let cur_q = ps_quote(&current_exe);
         let dir_q = ps_quote(exe_dir);
+        let dir_clean_q = format!("'{}'", exe_dir_clean.replace('\'', "''"));
         let dl_q = ps_quote(&downloaded_path);
 
         let script = match asset.kind {
@@ -563,15 +577,28 @@ $pidToWait = {pid}
 $curExe = {cur_q}
 $exeDir = {dir_q}
 $newExe = {dl_q}
-try {{ Wait-Process -Id $pidToWait -Timeout 20 -ErrorAction SilentlyContinue }} catch {{}}
-Start-Sleep -Milliseconds 350
-for ($i = 0; $i -lt 15; $i++) {{
+$oldExe = "$curExe.old"
+try {{ Wait-Process -Id $pidToWait -Timeout 30 -ErrorAction SilentlyContinue }} catch {{}}
+Start-Sleep -Milliseconds 500
+$replaced = $false
+for ($i = 0; $i -lt 40; $i++) {{
   try {{
-    Move-Item -LiteralPath $newExe -Destination $curExe -Force
+    if (Test-Path -LiteralPath $oldExe) {{
+      Remove-Item -LiteralPath $oldExe -Force -ErrorAction Stop
+    }}
+    if (Test-Path -LiteralPath $curExe) {{
+      Move-Item -LiteralPath $curExe -Destination $oldExe -Force -ErrorAction Stop
+    }}
+    Copy-Item -LiteralPath $newExe -Destination $curExe -Force -ErrorAction Stop
+    $replaced = $true
     break
   }} catch {{
-    Start-Sleep -Milliseconds 300
+    Start-Sleep -Milliseconds 350
   }}
+}}
+if ($replaced) {{
+  Remove-Item -LiteralPath $newExe -Force -ErrorAction SilentlyContinue
+  Remove-Item -LiteralPath $oldExe -Force -ErrorAction SilentlyContinue
 }}
 if (Test-Path -LiteralPath $curExe) {{
   Start-Process -FilePath $curExe -WorkingDirectory $exeDir
@@ -583,13 +610,32 @@ if (Test-Path -LiteralPath $curExe) {{
 $pidToWait = {pid}
 $curExe = {cur_q}
 $exeDir = {dir_q}
+$dirClean = {dir_clean_q}
 $setupExe = {dl_q}
-try {{ Wait-Process -Id $pidToWait -Timeout 20 -ErrorAction SilentlyContinue }} catch {{}}
-Start-Sleep -Milliseconds 350
-Start-Process -FilePath $setupExe -ArgumentList ('/S /D=' + $exeDir) -Wait
+$beforeTime = if (Test-Path -LiteralPath $curExe) {{ (Get-Item -LiteralPath $curExe).LastWriteTimeUtc }} else {{ [datetime]::MinValue }}
+try {{ Wait-Process -Id $pidToWait -Timeout 30 -ErrorAction SilentlyContinue }} catch {{}}
+Start-Sleep -Milliseconds 500
+try {{
+  Start-Process -FilePath $setupExe -ArgumentList ('/S /D=' + $dirClean) -Wait -ErrorAction Stop
+}} catch {{
+  try {{
+    Start-Process -FilePath $setupExe -ArgumentList ('/S /D=' + $dirClean) -Verb RunAs -Wait -ErrorAction Stop
+  }} catch {{}}
+}}
 Remove-Item -LiteralPath $setupExe -Force -ErrorAction SilentlyContinue
-if (Test-Path -LiteralPath $curExe) {{
-  Start-Process -FilePath $curExe -WorkingDirectory $exeDir
+$launchExe = $curExe
+$curUpdated = (Test-Path -LiteralPath $curExe) -and ((Get-Item -LiteralPath $curExe).LastWriteTimeUtc -gt $beforeTime)
+if (-not $curUpdated) {{
+  $newestExe = Get-ChildItem -LiteralPath $exeDir -Filter '*.exe' -File -ErrorAction SilentlyContinue |
+    Where-Object {{ $_.Name -notmatch 'unins|setup|installer|\.update\.exe$' }} |
+    Sort-Object LastWriteTimeUtc -Descending |
+    Select-Object -First 1
+  if ($newestExe -and ($newestExe.LastWriteTimeUtc -gt $beforeTime)) {{
+    $launchExe = $newestExe.FullName
+  }}
+}}
+if (Test-Path -LiteralPath $launchExe) {{
+  Start-Process -FilePath $launchExe -WorkingDirectory $exeDir
 }}
 "#
             ),
@@ -603,22 +649,26 @@ $curExe = {cur_q}
 $exeDir = {dir_q}
 $zipPath = {dl_q}
 $extractDir = {ext_q}
-try {{ Wait-Process -Id $pidToWait -Timeout 20 -ErrorAction SilentlyContinue }} catch {{}}
-Start-Sleep -Milliseconds 350
+$oldExe = "$curExe.old"
+try {{ Wait-Process -Id $pidToWait -Timeout 30 -ErrorAction SilentlyContinue }} catch {{}}
+Start-Sleep -Milliseconds 500
 if (Test-Path -LiteralPath $extractDir) {{ Remove-Item -LiteralPath $extractDir -Recurse -Force -ErrorAction SilentlyContinue }}
-Expand-Archive -LiteralPath $zipPath -DestinationPath $extractDir -Force
+Expand-Archive -LiteralPath $zipPath -DestinationPath $extractDir -Force -ErrorAction Stop
 $exeCandidate = Get-ChildItem -LiteralPath $extractDir -Filter *.exe -Recurse | Select-Object -First 1
 if ($exeCandidate) {{
-  for ($i = 0; $i -lt 15; $i++) {{
+  for ($i = 0; $i -lt 40; $i++) {{
     try {{
-      Copy-Item -LiteralPath $exeCandidate.FullName -Destination $curExe -Force
+      if (Test-Path -LiteralPath $oldExe) {{ Remove-Item -LiteralPath $oldExe -Force -ErrorAction Stop }}
+      if (Test-Path -LiteralPath $curExe) {{ Move-Item -LiteralPath $curExe -Destination $oldExe -Force -ErrorAction Stop }}
+      Copy-Item -LiteralPath $exeCandidate.FullName -Destination $curExe -Force -ErrorAction Stop
       break
     }} catch {{
-      Start-Sleep -Milliseconds 300
+      Start-Sleep -Milliseconds 350
     }}
   }}
 }}
 Copy-Item -Path (Join-Path $extractDir '*') -Destination $exeDir -Recurse -Force -Exclude '*.exe' -ErrorAction SilentlyContinue
+Remove-Item -LiteralPath $oldExe -Force -ErrorAction SilentlyContinue
 Remove-Item -LiteralPath $extractDir -Recurse -Force -ErrorAction SilentlyContinue
 Remove-Item -LiteralPath $zipPath -Force -ErrorAction SilentlyContinue
 if (Test-Path -LiteralPath $curExe) {{
@@ -635,17 +685,32 @@ if (Test-Path -LiteralPath $curExe) {{
 
         if needs_elevation {
             let outer_ps = format!(
-                "Start-Process -FilePath 'powershell.exe' -Verb RunAs -WindowStyle Hidden -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-EncodedCommand','{}')",
+                "$p = Start-Process -FilePath 'powershell.exe' -Verb RunAs -WindowStyle Hidden -PassThru -ArgumentList @('-NoProfile','-ExecutionPolicy','Bypass','-EncodedCommand','{}'); if (-not $p) {{ exit 1 }}",
                 encoded
             );
-            Command::new("powershell.exe")
-                .args(["-NoProfile", "-WindowStyle", "Hidden", "-Command", &outer_ps])
-                .creation_flags(CREATE_NO_WINDOW | DETACHED_PROCESS)
-                .stdin(Stdio::null())
-                .stdout(Stdio::null())
-                .stderr(Stdio::null())
-                .spawn()
-                .map_err(|e| format!("Не удалось запустить установщик обновления: {}", e))?;
+            let status_res = tokio::task::spawn_blocking(move || {
+                Command::new("powershell.exe")
+                    .args(["-NoProfile", "-WindowStyle", "Hidden", "-Command", &outer_ps])
+                    .creation_flags(CREATE_NO_WINDOW)
+                    .stdin(Stdio::null())
+                    .stdout(Stdio::null())
+                    .stderr(Stdio::null())
+                    .status()
+            })
+            .await
+            .map_err(|e| format!("шибка запуска установщика: {}", e))?;
+
+            match status_res {
+                Ok(st) if st.success() => {}
+                _ => {
+                    let msg = "бновление отменено: требуются права администратора.".to_string();
+                    set_and_emit_status(&app, |s| {
+                        s.state = "error".into();
+                        s.error = Some(msg.clone());
+                    });
+                    return Err(msg);
+                }
+            }
         } else {
             Command::new("powershell.exe")
                 .args(["-NoProfile", "-ExecutionPolicy", "Bypass", "-WindowStyle", "Hidden", "-EncodedCommand", &encoded])
@@ -654,7 +719,7 @@ if (Test-Path -LiteralPath $curExe) {{
                 .stdout(Stdio::null())
                 .stderr(Stdio::null())
                 .spawn()
-                .map_err(|e| format!("Не удалось запустить скрипт обновления: {}", e))?;
+                .map_err(|e| format!("е удалось запустить скрипт обновления: {}", e))?;
         }
 
         app.exit(0);
@@ -671,7 +736,7 @@ if (Test-Path -LiteralPath $curExe) {{
         }
         if fs::rename(&downloaded_path, &current_exe).is_err() {
             fs::copy(&downloaded_path, &current_exe)
-                .map_err(|e| format!("Не удалось заменить файл лаунчера: {}", e))?;
+                .map_err(|e| format!("е удалось заменить файл лаунчера: {}", e))?;
             let _ = fs::remove_file(&downloaded_path);
         }
         let _ = Command::new(&current_exe)

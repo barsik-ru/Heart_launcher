@@ -175,6 +175,7 @@ pub struct HeartBridgeMod {
     pub download_url: Option<String>,
     pub version_id: Option<String>,
     pub sha1: Option<String>,
+    pub sha256: Option<String>,
     pub file_size: Option<u64>,
 }
 
@@ -187,6 +188,7 @@ pub struct HeartBridgeResourcePack {
     pub filename: String,
     pub download_url: String,
     pub sha1: Option<String>,
+    pub sha256: Option<String>,
     pub file_size: Option<u64>,
 }
 
@@ -200,6 +202,7 @@ pub struct HeartBridgeRawNews {
     pub image: Option<String>,
     pub published: Option<bool>,
 }
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AppUpdateStatus {

@@ -295,6 +295,7 @@ pub async fn prepare_environment(
         dest_path: client_jar_path.clone(),
         size: mojang_details.downloads.client.size,
         sha1: mojang_details.downloads.client.sha1.clone(),
+        sha256: None,
         label: format!("{}.jar", MINECRAFT_VERSION),
     });
 
@@ -311,6 +312,7 @@ pub async fn prepare_environment(
                     dest_path: dest,
                     size: artifact.size,
                     sha1: artifact.sha1.clone(),
+        sha256: None,
                     label: lib.name.clone(),
                 });
             }
@@ -326,6 +328,7 @@ pub async fn prepare_environment(
                                 dest_path: dest,
                                 size: nat["size"].as_u64(),
                                 sha1: nat["sha1"].as_str().map(String::from),
+        sha256: None,
                                 label: format!("Natives: {}", lib.name),
                             });
                         }
@@ -343,6 +346,7 @@ pub async fn prepare_environment(
             dest_path: dest,
             size: None,
             sha1: None,
+        sha256: None,
             label: flib.name.clone(),
         });
     }
@@ -415,6 +419,7 @@ pub async fn prepare_environment(
                             dest_path: dest,
                             size: obj["size"].as_u64(),
                             sha1: Some(hash.to_string()),
+        sha256: None,
                             label: format!("Ресурс: {}", hash),
                         });
                     }

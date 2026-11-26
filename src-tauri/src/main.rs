@@ -74,6 +74,7 @@ fn trim_all_process_tree() {
 }
 
 fn main() {
+    updater::cleanup_old_update_artifacts();
     if cfg!(windows) {
         std::env::set_var(
             "WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS",

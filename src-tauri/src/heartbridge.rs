@@ -52,28 +52,34 @@ const CORE_CLIENT_MODS: &[(&str, &str, &str)] = &[
     ),
 ];
 
-pub fn ensure_embedded_client_mods(game_dir: &Path) {
+pub fn ensure_embedded_client_mods(
+    game_dir: &Path,
+    install_overlay_fallback: bool,
+    install_identity_fallback: bool,
+) {
     let mods_dir = game_dir.join("mods");
     let _ = fs::create_dir_all(&mods_dir);
 
-    // 1. Всегда устанавливаем актуальный heart-overlay-1.0.0.jar (фикс мышки и borderless на Windows 11)
-    let overlay_jar = mods_dir.join("heart-overlay-1.0.0.jar");
-    let need_overlay_update = match fs::metadata(&overlay_jar) {
-        Ok(meta) => meta.len() != EMBEDDED_HEART_OVERLAY_JAR.len() as u64,
-        Err(_) => true,
-    };
-    if need_overlay_update {
-        let _ = fs::write(&overlay_jar, EMBEDDED_HEART_OVERLAY_JAR);
+    if install_overlay_fallback {
+        let overlay_jar = mods_dir.join("heart-overlay-1.0.0.jar");
+        let need_overlay_update = match fs::metadata(&overlay_jar) {
+            Ok(meta) => meta.len() != EMBEDDED_HEART_OVERLAY_JAR.len() as u64,
+            Err(_) => true,
+        };
+        if need_overlay_update {
+            let _ = fs::write(&overlay_jar, EMBEDDED_HEART_OVERLAY_JAR);
+        }
     }
 
-    // 2. Гарантируем, что heart-identity-fabric.jar существует и не пустой (0 байт)
-    let identity_jar = mods_dir.join("heart-identity-fabric.jar");
-    let need_identity_fallback = match fs::metadata(&identity_jar) {
-        Ok(meta) => meta.len() == 0,
-        Err(_) => true,
-    };
-    if need_identity_fallback {
-        let _ = fs::write(&identity_jar, EMBEDDED_HEART_IDENTITY_JAR);
+    if install_identity_fallback {
+        let identity_jar = mods_dir.join("heart-identity-fabric.jar");
+        let need_identity_fallback = match fs::metadata(&identity_jar) {
+            Ok(meta) => meta.len() == 0,
+            Err(_) => true,
+        };
+        if need_identity_fallback {
+            let _ = fs::write(&identity_jar, EMBEDDED_HEART_IDENTITY_JAR);
+        }
     }
 }
 
@@ -116,7 +122,7 @@ pub async fn fetch_news() -> Vec<NewsArticle> {
                             title: item.title,
                             excerpt,
                             content: item.content,
-                            category: "Объявления".into(),
+                            category: "бъявления".into(),
                             date: item.created_at.unwrap_or_else(|| "2026-11-04T00:00:00.000Z".into()),
                             image: item.image.unwrap_or_else(|| "worlds/forest-river.webp".into()),
                             pinned: Some(true),
@@ -130,9 +136,9 @@ pub async fn fetch_news() -> Vec<NewsArticle> {
     vec![NewsArticle {
         id: "1".into(),
         title: "Heart Network обновлён!".into(),
-        excerpt: "Защищенное HTTPS-подключение активно.".into(),
+        excerpt: "ащищенное HTTPS-подключение активно.".into(),
         content: "Синхронизация модов и Heart Identity работает в штатном режиме.".into(),
-        category: "Объявления".into(),
+        category: "бъявления".into(),
         date: "2026-11-04T00:00:00.000Z".into(),
         image: "worlds/forest-river.webp".into(),
         pinned: Some(true),
@@ -149,7 +155,7 @@ pub async fn get_modpack_info(game_dir: &Path) -> InstallationInfo {
             for entry in entries.filter_map(|e| e.ok()) {
                 if let Some(name) = entry.file_name().to_str() {
                     if name.ends_with(".jar") {
-                        installed_mods.push(format!("{} — установлено", name));
+                        installed_mods.push(format!("{} - установлено", name));
                     }
                 }
             }
@@ -178,12 +184,12 @@ pub async fn get_modpack_info(game_dir: &Path) -> InstallationInfo {
         java_major_version: 21,
         changes: ModpackChanges {
             added: installed_mods,
-            updated: vec!["Проверка новых релизов модов и ресурс-паков".into()],
+            updated: vec!["роверка новых релизов модов и ресурс-паков".into()],
             removed: vec!["Серверные утилиты исключены из клиента".into()],
             configurations: vec![
                 "Minecraft Java 1.21.11".into(),
                 "Fabric Loader 0.19.5".into(),
-                "Клиентский профиль".into(),
+                "лиентский профиль".into(),
             ],
         },
     }
@@ -234,7 +240,7 @@ async fn resolve_modrinth_file(
         slug_or_id, MINECRAFT_VERSION
     );
 
-    let mut last_err = format!("Не удалось найти версию {} на Modrinth", slug_or_id);
+    let mut last_err = format!("е удалось найти версию {} на Modrinth", slug_or_id);
     for attempt in 1..=3u64 {
         match client.get(&q_url).send().await {
             Ok(resp) => {
@@ -268,13 +274,13 @@ async fn resolve_modrinth_file(
                                 }
                             }
                             return Err(format!(
-                                "Для {} не найдена совместимая Fabric-версия {}",
+                                "ля {} не найдена совместимая Fabric-версия {}",
                                 slug_or_id, MINECRAFT_VERSION
                             ));
                         }
                         Err(e) => {
                             last_err = format!(
-                                "Ошибка чтения ответа Modrinth для {}: {}",
+                                "шибка чтения ответа Modrinth для {}: {}",
                                 slug_or_id,
                                 format_error_chain(&e)
                             );
@@ -284,7 +290,7 @@ async fn resolve_modrinth_file(
             }
             Err(e) => {
                 last_err = format!(
-                    "Ошибка запроса Modrinth для {}: {}",
+                    "шибка запроса Modrinth для {}: {}",
                     slug_or_id,
                     format_error_chain(&e)
                 );
@@ -311,8 +317,6 @@ pub async fn sync_heartbridge_modpack(
     let _ = fs::create_dir_all(&rp_dir);
     let _ = fs::create_dir_all(&cache_dir);
 
-    ensure_embedded_client_mods(game_dir);
-
     let cache_file = cache_dir.join("tauri-modpack-cache.json");
     let mut cache: ModpackResolutionCache = fs::read_to_string(&cache_file)
         .ok()
@@ -323,11 +327,10 @@ pub async fn sync_heartbridge_modpack(
     let mut download_tasks: Vec<DownloadTask> = Vec::new();
     let mut queued_paths: HashSet<String> = HashSet::new();
     let mut manifest_slugs: HashSet<String> = HashSet::new();
-
-    // Точный список всех JAR-файлов (в нижнем регистре), которые должны остаться в mods/
     let mut expected_mod_files: HashSet<String> = HashSet::new();
-    expected_mod_files.insert("heart-overlay-1.0.0.jar".to_string());
-    expected_mod_files.insert("heart-identity-fabric.jar".to_string());
+
+    let mut has_remote_overlay = false;
+    let mut has_remote_identity = false;
 
     let mut push_task = |task: DownloadTask| {
         let key = task.dest_path.to_string_lossy().to_lowercase();
@@ -336,13 +339,18 @@ pub async fn sync_heartbridge_modpack(
         }
     };
 
-    // 1. Получаем манифест сборки и ресурс-паки от сервера HeartBridge
     let manifest_url = format!("{}/v1/modpack", HEART_BRIDGE_BASE);
     let mut manifest_opt: Option<HeartBridgeManifest> = None;
     let mut manifest_err: Option<String> = None;
 
     for attempt in 1..=3u64 {
-        match client.get(&manifest_url).send().await {
+        match client
+            .get(&manifest_url)
+            .header("Cache-Control", "no-cache")
+            .header("Pragma", "no-cache")
+            .send()
+            .await
+        {
             Ok(res) => {
                 if !res.status().is_success() {
                     manifest_err = Some(format!(
@@ -359,7 +367,7 @@ pub async fn sync_heartbridge_modpack(
                             }
                             Err(e) => {
                                 manifest_err = Some(format!(
-                                    "Некорректный JSON манифеста HeartBridge: {}",
+                                    "екорректный JSON манифеста HeartBridge: {}",
                                     e
                                 ));
                                 break;
@@ -367,7 +375,7 @@ pub async fn sync_heartbridge_modpack(
                         },
                         Err(e) => {
                             manifest_err = Some(format!(
-                                "Ошибка чтения манифеста HeartBridge: {}",
+                                "шибка чтения манифеста HeartBridge: {}",
                                 format_error_chain(&e)
                             ));
                         }
@@ -387,7 +395,7 @@ pub async fn sync_heartbridge_modpack(
     }
 
     if let Some(err_msg) = manifest_err {
-        on_log(&format!("ВНИМАНИЕ: {}", err_msg));
+        on_log(&format!(": {}", err_msg));
         if cache.mods.is_empty() {
             return Err(err_msg);
         }
@@ -399,12 +407,10 @@ pub async fn sync_heartbridge_modpack(
     if let Some(manifest) = manifest_opt {
         if cache.revision != manifest.revision {
             cache.revision = manifest.revision;
-            // При смене ревизии сбрасываем незакреплённые `:latest` кэши
-            cache.mods.retain(|k, _| !k.ends_with(":latest"));
+            cache.mods.clear();
             cache_dirty = true;
         }
 
-        // Моды из манифеста HeartBridge
         for m in manifest.mods {
             let slug_lower = m.slug.to_lowercase();
             manifest_slugs.insert(slug_lower.clone());
@@ -414,7 +420,13 @@ pub async fn sync_heartbridge_modpack(
                 || slug_lower.contains("heart_overlay")
                 || filename_lower.contains("heart-overlay")
             {
-                continue;
+                has_remote_overlay = true;
+            }
+            if slug_lower.contains("heart-identity")
+                || slug_lower.contains("heart_identity")
+                || filename_lower.contains("heart-identity")
+            {
+                has_remote_identity = true;
             }
 
             if let Some(url_str) = &m.download_url {
@@ -431,20 +443,22 @@ pub async fn sync_heartbridge_modpack(
                     dest_path: mods_dir.join(&filename),
                     size: m.file_size,
                     sha1: m.sha1.clone(),
-                    label: format!("Мод: {}", filename),
+                    sha256: m.sha256.clone(),
+                    label: format!("од: {}", filename),
                 });
             } else {
                 let cache_key = format!("{}:{}", m.slug, m.version_id.as_deref().unwrap_or("latest"));
                 if let Some(cached) = cache.mods.get(&cache_key) {
                     expected_mod_files.insert(cached.filename.to_lowercase());
                     let dest = mods_dir.join(&cached.filename);
-                    if !is_valid_existing_file(&dest, cached.size, cached.sha1.as_deref()) {
+                    if !is_valid_existing_file(&dest, cached.size, cached.sha1.as_deref(), None) {
                         push_task(DownloadTask {
                             url: cached.url.clone(),
                             dest_path: dest,
                             size: cached.size,
                             sha1: cached.sha1.clone(),
-                            label: format!("Мод: {}", cached.filename),
+                            sha256: None,
+                            label: format!("од: {}", cached.filename),
                         });
                     }
                 } else {
@@ -466,13 +480,13 @@ pub async fn sync_heartbridge_modpack(
                         dest_path: mods_dir.join(&filename),
                         size,
                         sha1,
-                        label: format!("Мод: {}", filename),
+                        sha256: None,
+                        label: format!("од: {}", filename),
                     });
                 }
             }
         }
 
-        // Ресурс-паки
         if let Some(rps) = manifest.resource_packs {
             for rp in rps {
                 current_rp_files.insert(rp.filename.clone());
@@ -487,29 +501,37 @@ pub async fn sync_heartbridge_modpack(
                     dest_path: rp_dir.join(&rp.filename),
                     size: rp.file_size,
                     sha1: rp.sha1.clone(),
-                    label: format!("Ресурс-пак: {}", rp.title.unwrap_or(rp.slug)),
+                    sha256: rp.sha256.clone(),
+                    label: format!("есурс-пак: {}", rp.title.unwrap_or(rp.slug)),
                 });
             }
         }
     }
 
-    // 2. Базовые клиентские библиотеки — разрешаем точные имена файлов, чтобы очистка не удалила нужные
     for (slug, direct_url, default_filename) in CORE_CLIENT_MODS {
-        if manifest_slugs.contains(*slug) {
+        let slug_under = slug.replace('-', "_");
+        let already_in_manifest = manifest_slugs
+            .iter()
+            .any(|s| s.as_str() == *slug || s.starts_with(*slug))
+            || expected_mod_files
+                .iter()
+                .any(|f| f.starts_with(*slug) || f.starts_with(&slug_under));
+        if already_in_manifest {
             continue;
         }
 
         if *slug == "fabric-api" {
             expected_mod_files.insert(default_filename.to_lowercase());
             let dest = mods_dir.join(default_filename);
-            if !is_valid_existing_file(&dest, Some(2427670), None) {
-                on_log("Загрузка библиотеки Fabric API 1.21.11...");
+            if !is_valid_existing_file(&dest, Some(2427670), None, None) {
+                on_log("агрузка библиотеки Fabric API 1.21.11...");
                 push_task(DownloadTask {
                     url: direct_url.to_string(),
                     dest_path: dest,
                     size: Some(2427670),
                     sha1: None,
-                    label: format!("Мод: {}", default_filename),
+                    sha256: None,
+                    label: format!("од: {}", default_filename),
                 });
             }
         } else if direct_url.starts_with("https://cdn.modrinth.com") {
@@ -519,20 +541,22 @@ pub async fn sync_heartbridge_modpack(
                 dest_path: mods_dir.join(default_filename),
                 size: None,
                 sha1: None,
-                label: format!("Мод: {}", default_filename),
+                sha256: None,
+                label: format!("од: {}", default_filename),
             });
         } else {
             let core_key = format!("core:{}", slug);
             if let Some(cached) = cache.mods.get(&core_key) {
                 expected_mod_files.insert(cached.filename.to_lowercase());
                 let dest = mods_dir.join(&cached.filename);
-                if !is_valid_existing_file(&dest, cached.size, cached.sha1.as_deref()) {
+                if !is_valid_existing_file(&dest, cached.size, cached.sha1.as_deref(), None) {
                     push_task(DownloadTask {
                         url: cached.url.clone(),
                         dest_path: dest,
                         size: cached.size,
                         sha1: cached.sha1.clone(),
-                        label: format!("Мод: {}", cached.filename),
+                        sha256: None,
+                        label: format!("од: {}", cached.filename),
                     });
                 }
             } else if let Ok((url, filename, size, sha1)) =
@@ -554,10 +578,10 @@ pub async fn sync_heartbridge_modpack(
                     dest_path: mods_dir.join(&filename),
                     size,
                     sha1,
-                    label: format!("Мод: {}", filename),
+                    sha256: None,
+                    label: format!("од: {}", filename),
                 });
             } else if let Ok(entries) = fs::read_dir(&mods_dir) {
-                // Фоллбек на случай офлайна Modrinth: оставляем существующий JAR этой библиотеки
                 for entry in entries.flatten() {
                     let fname = entry.file_name().to_string_lossy().to_string();
                     let lower = fname.to_lowercase();
@@ -575,32 +599,44 @@ pub async fn sync_heartbridge_modpack(
         }
     }
 
-    // 3. Companion
-    let companion_info_url = format!("{}/v1/companion/info", HEART_BRIDGE_BASE);
-    if let Ok(res) = client.get(&companion_info_url).send().await {
-        if res.status().is_success() {
-            if let Ok(info) = res.json::<serde_json::Value>().await {
-                if let (Some(sha256), Some(dl_url)) =
-                    (info["sha256"].as_str(), info["downloadUrl"].as_str())
-                {
-                    let target_jar = mods_dir.join("heart-identity-fabric.jar");
-                    if !verify_file_sha256(&target_jar, sha256) {
-                        on_log("Обновление Heart Identity Companion...");
-                        let download_url =
-                            format!("{}/{}", HEART_BRIDGE_BASE, dl_url.trim_start_matches('/'));
-                        let _ = download_file_stream(&download_url, &target_jar, |_, _| {}).await;
+    if !has_remote_identity {
+        expected_mod_files.insert("heart-identity-fabric.jar".to_string());
+        let companion_info_url = format!("{}/v1/companion/info", HEART_BRIDGE_BASE);
+        if let Ok(res) = client
+            .get(&companion_info_url)
+            .header("Cache-Control", "no-cache")
+            .send()
+            .await
+        {
+            if res.status().is_success() {
+                if let Ok(info) = res.json::<serde_json::Value>().await {
+                    if let (Some(sha256), Some(dl_url)) =
+                        (info["sha256"].as_str(), info["downloadUrl"].as_str())
+                    {
+                        let target_jar = mods_dir.join("heart-identity-fabric.jar");
+                        if !verify_file_sha256(&target_jar, sha256) {
+                            on_log("бновление Heart Identity Companion...");
+                            let download_url =
+                                format!("{}/{}", HEART_BRIDGE_BASE, dl_url.trim_start_matches('/'));
+                            if let Err(e) =
+                                download_file_stream(&download_url, &target_jar, |_, _| {}).await
+                            {
+                                on_log(&format!(": е удалось обновить Companion: {}", e));
+                            }
+                        }
                     }
                 }
             }
         }
     }
 
-    ensure_embedded_client_mods(game_dir);
+    if !has_remote_overlay {
+        expected_mod_files.insert("heart-overlay-1.0.0.jar".to_string());
+    }
+    ensure_embedded_client_mods(game_dir, !has_remote_overlay, !has_remote_identity);
 
-    // 4. Загружаем недостающие/обновлённые файлы
     let downloaded_count = download_pool(download_tasks, 8, on_progress).await?;
 
-    // 5. Удаляем лишние моды и устаревшие управляемые ресурс-паки, если получен свежий манифест
     if has_authoritative_manifest {
         if let Ok(entries) = fs::read_dir(&mods_dir) {
             for entry in entries.flatten() {
@@ -614,13 +650,12 @@ pub async fn sync_heartbridge_modpack(
                     && !expected_mod_files.contains(&lower)
                 {
                     if fs::remove_file(&path).is_ok() {
-                        on_log(&format!("Удалён лишний мод: {}", fname));
+                        on_log(&format!("далён лишний мод: {}", fname));
                     }
                 }
             }
         }
 
-        // Очистка только тех ресурс-паков, которыми ранее управлял лаунчер
         let managed_rp_file = cache_dir.join("tauri-managed-resourcepacks.json");
         let previous_rps: Vec<String> = fs::read_to_string(&managed_rp_file)
             .ok()
@@ -631,7 +666,7 @@ pub async fn sync_heartbridge_modpack(
             if !current_rp_files.contains(&old_rp) {
                 let old_path = rp_dir.join(&old_rp);
                 if old_path.exists() && fs::remove_file(&old_path).is_ok() {
-                    on_log(&format!("Удалён устаревший ресурс-пак: {}", old_rp));
+                    on_log(&format!("далён устаревший ресурс-пак: {}", old_rp));
                 }
             }
         }
@@ -642,9 +677,13 @@ pub async fn sync_heartbridge_modpack(
         }
     }
 
-    // 6. Конфиги
     let configs_url = format!("{}/v1/configs/manifest", HEART_BRIDGE_BASE);
-    if let Ok(res) = client.get(&configs_url).send().await {
+    if let Ok(res) = client
+        .get(&configs_url)
+        .header("Cache-Control", "no-cache")
+        .send()
+        .await
+    {
         if res.status().is_success() {
             if let Ok(manifest) = res.json::<serde_json::Value>().await {
                 if let Some(files) = manifest["files"].as_array() {
@@ -654,11 +693,13 @@ pub async fn sync_heartbridge_modpack(
                             entry["sha256"].as_str(),
                             entry["downloadUrl"].as_str(),
                         ) {
-                            let clean_path =
-                                path_str.trim_start_matches("config/").trim_start_matches('/');
+                            let normalized = path_str.replace('\\', "/");
+                            let clean_path = normalized
+                                .trim_start_matches("config/")
+                                .trim_start_matches('/');
                             let target_path = game_dir.join("config").join(clean_path);
 
-                            if !verify_file_sha256(&target_path, sha256) {
+                            if sha256.trim().is_empty() || !verify_file_sha256(&target_path, sha256) {
                                 if let Some(p) = target_path.parent() {
                                     let _ = fs::create_dir_all(p);
                                 }
@@ -667,8 +708,14 @@ pub async fn sync_heartbridge_modpack(
                                     HEART_BRIDGE_BASE,
                                     dl_url.trim_start_matches('/')
                                 );
-                                let _ = download_file_stream(&download_url, &target_path, |_, _| {})
-                                    .await;
+                                if let Err(e) =
+                                    download_file_stream(&download_url, &target_path, |_, _| {}).await
+                                {
+                                    on_log(&format!(
+                                        ": е удалось загрузить конфиг {}: {}",
+                                        clean_path, e
+                                    ));
+                                }
                             }
                         }
                     }
